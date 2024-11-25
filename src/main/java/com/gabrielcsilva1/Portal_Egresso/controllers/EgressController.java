@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/egress")
-public class EgressController {
+public class EgressController { 
 
   @GetMapping
   public String get() {
