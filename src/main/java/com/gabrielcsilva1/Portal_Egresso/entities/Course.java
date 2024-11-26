@@ -10,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,39 +17,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "egress")
+@Table(name = "course")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Egress {
+public class Course {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
-  @OneToMany(mappedBy = "egress")
+  @OneToMany(mappedBy = "course")
   private Set<CourseEgress> courseEgress;
-  
+
   @Column(nullable = false)
   @NotBlank
   private String name;
 
   @Column(nullable = false)
   @NotBlank
-  @Email
-  private String email;
-
-  private String description;
-
-  @Column(name = "avatar_url")
-  private String avatarUrl;
-
-  @Column(name = "linkedin_url")
-  private String linkedinUrl;
-
-  @Column(name = "instagram_url")
-  private String instagramUrl;
-
-  @Column(name = "curriculum_url")
-  private String curriculumUrl;
+  private String level;
 }
