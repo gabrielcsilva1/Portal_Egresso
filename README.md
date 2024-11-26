@@ -20,7 +20,7 @@ Permitir cadastrar egresso e manter suas principais informações:
 # Executando localmente
 Clone do projeto
 ```bash
-git@github.com:gabrielcsilva1/Portal_Egresso.git
+git clone git@github.com:gabrielcsilva1/Portal_Egresso.git
 ```
 
 Acessando a pasta do projeto 
