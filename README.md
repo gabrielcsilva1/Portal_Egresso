@@ -23,7 +23,7 @@ Projeto da disciplina Laboratório de Programação (2024.2). O Portal de Egress
 # Executando localmente
 Clone do projeto
 ```bash
-git@github.com:gabrielcsilva1/Portal_Egresso.git
+git clone git@github.com:gabrielcsilva1/Portal_Egresso.git
 ```
 
 Acessando a pasta do projeto 
