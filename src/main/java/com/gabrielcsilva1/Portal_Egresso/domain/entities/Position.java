@@ -1,9 +1,6 @@
-package com.gabrielcsilva1.Portal_Egresso.entities;
+package com.gabrielcsilva1.Portal_Egresso.domain.entities;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
-
-import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,18 +10,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
 @Entity
-@Table(name = "testimonial")
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class Testimonial {
+@Table(name = "position")
+public class Position {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
@@ -33,9 +24,18 @@ public class Testimonial {
   @JoinColumn(name = "egress_id", insertable = false, nullable = false)
   private Egress egress;
 
-  private String text;
+  @NotBlank
+  @Column(nullable = false)
+  private String description;
 
-  @CreationTimestamp
-  @Column(name = "created_at")
-  private LocalDateTime createdAt;
+  @NotBlank
+  @Column(nullable = false)
+  private String company;
+
+  @Positive
+  @Column(name = "start_year", nullable = false)
+  private Integer startYear;
+
+  @Column(name = "end_year")
+  private Integer endYear;
 }

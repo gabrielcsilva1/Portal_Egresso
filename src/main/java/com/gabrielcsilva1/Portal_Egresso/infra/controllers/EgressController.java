@@ -1,4 +1,4 @@
-package com.gabrielcsilva1.Portal_Egresso.controllers;
+package com.gabrielcsilva1.Portal_Egresso.infra.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

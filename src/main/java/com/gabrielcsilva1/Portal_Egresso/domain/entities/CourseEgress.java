@@ -1,4 +1,4 @@
-package com.gabrielcsilva1.Portal_Egresso.entities;
+package com.gabrielcsilva1.Portal_Egresso.domain.entities;
 
 import java.util.UUID;
 
