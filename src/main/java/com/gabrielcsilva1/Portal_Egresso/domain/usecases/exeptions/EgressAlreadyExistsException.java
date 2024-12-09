@@ -1,4 +1,4 @@
-package com.gabrielcsilva1.Portal_Egresso.exeptions;
+package com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions;
 
 public class EgressAlreadyExistsException extends RuntimeException{
   public EgressAlreadyExistsException(String key, String identifier) { 

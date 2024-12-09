@@ -8,29 +8,25 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
-import com.gabrielcsilva1.Portal_Egresso.exeptions.EgressAlreadyExistsException;
+import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.EgressAlreadyExistsException;
 
+@ExtendWith(MockitoExtension.class)
 public class CreateEgressUseCaseTest {
   @InjectMocks
   private CreateEgressUseCase createEgressUseCase;
 
   @Mock
   private EgressRepository egressRepository;
-
-  @BeforeEach
-  public void setup() {
-    MockitoAnnotations.openMocks(this);
-  }
 
   @Test
   @DisplayName("should be able to create a new egress.")

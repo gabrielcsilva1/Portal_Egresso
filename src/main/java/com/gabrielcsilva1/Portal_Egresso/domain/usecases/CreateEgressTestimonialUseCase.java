@@ -7,7 +7,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.dtos.TestimonialDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.TestimonialRepository;
-import com.gabrielcsilva1.Portal_Egresso.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.EgressNotFoundException;
 
 @Service
 public class CreateEgressTestimonialUseCase {

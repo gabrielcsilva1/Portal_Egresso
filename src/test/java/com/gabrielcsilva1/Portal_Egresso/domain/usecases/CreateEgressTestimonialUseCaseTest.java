@@ -9,20 +9,21 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.TestimonialDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.TestimonialRepository;
-import com.gabrielcsilva1.Portal_Egresso.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.EgressNotFoundException;
 
+@ExtendWith(MockitoExtension.class)
 public class CreateEgressTestimonialUseCaseTest {
   @InjectMocks
   private CreateEgressTestimonialUseCase createEgressTestimonialUseCase;
@@ -33,14 +34,9 @@ public class CreateEgressTestimonialUseCaseTest {
   @Mock
   private EgressRepository egressRepository;
 
-  @BeforeEach
-  public void setup() {
-    MockitoAnnotations.openMocks(this);
-  }
-
   @Test
   @DisplayName("should be able to create a egress testimonial.")
-  public void sucess() {
+  public void success() {
     var testimonialDTO = TestimonialDTO.builder()
     .egressId(UUID.randomUUID())
     .text("testimonial test")
@@ -68,7 +64,7 @@ public class CreateEgressTestimonialUseCaseTest {
     var result = this.createEgressTestimonialUseCase.execute(testimonialDTO);
 
     assertEquals(result.getId(), mockTestimonial.getId());
-    assertEquals(result.getEgress(), mockTestimonial.getEgress());
+    assertEquals(result.getEgress().getId(), mockTestimonial.getEgress().getId());
     assertEquals(result.getCreatedAt(), mockTestimonial.getCreatedAt());
   }
 

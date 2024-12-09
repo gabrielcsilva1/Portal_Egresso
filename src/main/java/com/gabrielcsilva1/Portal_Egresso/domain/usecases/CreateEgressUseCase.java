@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
-import com.gabrielcsilva1.Portal_Egresso.exeptions.EgressAlreadyExistsException;
+import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.EgressAlreadyExistsException;
 
 @Service
 public class CreateEgressUseCase {
