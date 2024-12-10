@@ -31,7 +31,7 @@ public class Egress {
   private UUID id;
 
   @OneToMany(mappedBy = "egress")
-  private Set<CourseEgress> courseEgress;
+  private Set<EgressCourse> egressCourse;
   
   @Column(nullable = false)
   @NotBlank

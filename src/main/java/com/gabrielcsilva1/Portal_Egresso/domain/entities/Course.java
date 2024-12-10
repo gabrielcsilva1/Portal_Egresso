@@ -34,7 +34,7 @@ public class Course {
   private Coordinator coordinator;
 
   @OneToMany(mappedBy = "course")
-  private Set<CourseEgress> courseEgress;
+  private Set<EgressCourse> egressCourse;
 
   @Column(nullable = false)
   @NotBlank

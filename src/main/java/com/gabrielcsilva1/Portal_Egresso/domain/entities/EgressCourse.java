@@ -11,10 +11,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Positive;
+import lombok.Builder;
+import lombok.Getter;
 
 @Entity
-@Table(name = "course_egress")
-public class CourseEgress {
+@Table(name = "egress_course")
+@Builder
+@Getter
+public class EgressCourse {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
