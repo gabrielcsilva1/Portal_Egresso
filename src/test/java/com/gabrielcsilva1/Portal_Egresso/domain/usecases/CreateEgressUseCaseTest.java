@@ -31,11 +31,13 @@ public class CreateEgressUseCaseTest {
   @Test
   @DisplayName("should be able to create a new egress.")
   public void success() {
+    // DTO
     EgressDTO egressDTO = EgressDTO.builder()
       .email("johnDoe@example.com")
       .name("John Doe")
       .build();
     
+    // Mocks
     Egress mockEgress = Egress.builder()
       .id(UUID.randomUUID())
       .name(egressDTO.getName())
@@ -48,21 +50,24 @@ public class CreateEgressUseCaseTest {
     when(egressRepository.save(any(Egress.class)))
       .thenReturn(mockEgress);
 
-    var result = this.sut.execute(egressDTO);
+    // Test
+    Egress result = this.sut.execute(egressDTO);
 
     assertEquals(result.getId(), mockEgress.getId());
-    assertEquals(result.getEmail(), mockEgress.getEmail());
-    assertEquals(result.getName(), mockEgress.getName());
+    assertEquals(result.getEmail(), egressDTO.getEmail());
+    assertEquals(result.getName(), egressDTO.getName());
   }
 
   @Test
   @DisplayName("should not be able to create a new egress with a duplicate email address.")
   public void emailAlreadyExists() {
+    // DTO
     EgressDTO egressDTO = EgressDTO.builder()
       .email("johnDoe@example.com")
       .name("John Doe")
       .build();
     
+    // Mocks
     Egress mockEgress = Egress.builder()
       .id(UUID.randomUUID())
       .name(egressDTO.getName())
@@ -72,7 +77,7 @@ public class CreateEgressUseCaseTest {
     when(egressRepository.findByEmail(egressDTO.getEmail()))
       .thenReturn(Optional.of(mockEgress));
     
-
+    // Test
     assertThrows(EgressAlreadyExistsException.class, () -> {
       this.sut.execute(egressDTO);
     });

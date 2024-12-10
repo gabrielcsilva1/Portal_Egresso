@@ -61,11 +61,11 @@ public class CreateCourseUseCaseTest {
     when(this.courseRepository.save(any(Course.class)))
       .thenReturn(courseMock);
 
-    // Execution
-    var result = this.sut.execute(courseDTO);
+    // Test
+    Course result = this.sut.execute(courseDTO);
 
     assertEquals(result.getId(), courseMock.getId());
-    assertEquals(result.getCoordinator().getId(), coordinatorMock.getId());
+    assertEquals(result.getCoordinator().getId(), courseDTO.getCoordinatorId());
   }
 
   @Test
@@ -82,7 +82,7 @@ public class CreateCourseUseCaseTest {
    when(this.coordinatorRepository.findById(courseDTO.getCoordinatorId()))
      .thenReturn(Optional.empty());
 
-   // Execution
+   // Test
    assertThrows(CoordinatorNotFoundException.class, () -> {
       this.sut.execute(courseDTO);
    });

@@ -37,11 +37,13 @@ public class CreateEgressTestimonialUseCaseTest {
   @Test
   @DisplayName("should be able to create a egress testimonial.")
   public void success() {
+    // DTO
     var testimonialDTO = TestimonialDTO.builder()
     .egressId(UUID.randomUUID())
     .text("testimonial test")
     .build();
 
+    // Mocks
     var mockEgress = Egress.builder()
       .id(testimonialDTO.getEgressId())
       .name("John Doe")
@@ -61,24 +63,28 @@ public class CreateEgressTestimonialUseCaseTest {
     when(this.testimonialRepository.save(any(Testimonial.class)))
       .thenReturn(mockTestimonial);
 
-    var result = this.sut.execute(testimonialDTO);
+    // Test
+    Testimonial result = this.sut.execute(testimonialDTO);
 
     assertEquals(result.getId(), mockTestimonial.getId());
-    assertEquals(result.getEgress().getId(), mockTestimonial.getEgress().getId());
+    assertEquals(result.getEgress().getId(), testimonialDTO.getEgressId());
     assertEquals(result.getCreatedAt(), mockTestimonial.getCreatedAt());
   }
 
   @Test
   @DisplayName("should not be able to create a testimonial from a egress that does not exist")
   public void egressNotFound() {
+    // DTO
     var testimonialDTO = TestimonialDTO.builder()
     .egressId(UUID.randomUUID())
     .text("testimonial test")
     .build();
 
+    // Mocks
     when(this.egressRepository.findById(testimonialDTO.getEgressId()))
       .thenReturn(Optional.empty());
 
+    // Test
     assertThrows(EgressNotFoundException.class, () -> {
       this.sut.execute(testimonialDTO);
     });
