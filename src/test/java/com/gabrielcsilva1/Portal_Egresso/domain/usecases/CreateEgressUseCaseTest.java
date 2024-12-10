@@ -23,7 +23,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.EgressAlready
 @ExtendWith(MockitoExtension.class)
 public class CreateEgressUseCaseTest {
   @InjectMocks
-  private CreateEgressUseCase createEgressUseCase;
+  private CreateEgressUseCase sut;
 
   @Mock
   private EgressRepository egressRepository;
@@ -48,7 +48,7 @@ public class CreateEgressUseCaseTest {
     when(egressRepository.save(any(Egress.class)))
       .thenReturn(mockEgress);
 
-    var result = this.createEgressUseCase.execute(egressDTO);
+    var result = this.sut.execute(egressDTO);
 
     assertEquals(result.getId(), mockEgress.getId());
     assertEquals(result.getEmail(), mockEgress.getEmail());
@@ -74,7 +74,7 @@ public class CreateEgressUseCaseTest {
     
 
     assertThrows(EgressAlreadyExistsException.class, () -> {
-      this.createEgressUseCase.execute(egressDTO);
+      this.sut.execute(egressDTO);
     });
   }
 }

@@ -26,7 +26,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.EgressNotFoun
 @ExtendWith(MockitoExtension.class)
 public class CreateEgressTestimonialUseCaseTest {
   @InjectMocks
-  private CreateEgressTestimonialUseCase createEgressTestimonialUseCase;
+  private CreateEgressTestimonialUseCase sut;
 
   @Mock
   private TestimonialRepository testimonialRepository;
@@ -61,7 +61,7 @@ public class CreateEgressTestimonialUseCaseTest {
     when(this.testimonialRepository.save(any(Testimonial.class)))
       .thenReturn(mockTestimonial);
 
-    var result = this.createEgressTestimonialUseCase.execute(testimonialDTO);
+    var result = this.sut.execute(testimonialDTO);
 
     assertEquals(result.getId(), mockTestimonial.getId());
     assertEquals(result.getEgress().getId(), mockTestimonial.getEgress().getId());
@@ -80,7 +80,7 @@ public class CreateEgressTestimonialUseCaseTest {
       .thenReturn(Optional.empty());
 
     assertThrows(EgressNotFoundException.class, () -> {
-      this.createEgressTestimonialUseCase.execute(testimonialDTO);
+      this.sut.execute(testimonialDTO);
     });
   }
 

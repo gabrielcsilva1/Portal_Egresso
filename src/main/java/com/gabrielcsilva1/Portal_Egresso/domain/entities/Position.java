@@ -12,7 +12,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import lombok.Builder;
+import lombok.Getter;
 
+@Getter
+@Builder
 @Entity
 @Table(name = "position")
 public class Position {
@@ -36,6 +40,7 @@ public class Position {
   @Column(name = "start_year", nullable = false)
   private Integer startYear;
 
+  @Positive
   @Column(name = "end_year")
   private Integer endYear;
 }
