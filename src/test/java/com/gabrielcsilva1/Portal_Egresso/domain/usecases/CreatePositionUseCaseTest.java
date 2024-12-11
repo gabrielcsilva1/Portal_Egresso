@@ -38,7 +38,7 @@ public class CreatePositionUseCaseTest {
   public void success() {
     // DTO
     PositionDTO positionDTO = PositionDTO.builder()
-      .egressoId(UUID.randomUUID())
+      .egressId(UUID.randomUUID())
       .description("Position Description")
       .location("Location Name")
       .startYear(2000)
@@ -47,7 +47,7 @@ public class CreatePositionUseCaseTest {
 
     // Mocks
     Egress egressMock = Egress.builder()
-      .id(positionDTO.getEgressoId())
+      .id(positionDTO.getEgressId())
       .build();
     
     Position positionMock = Position.builder()
@@ -59,7 +59,7 @@ public class CreatePositionUseCaseTest {
       .endYear(positionDTO.getEndYear())
       .build();
 
-    when(this.egressRepository.findById(positionDTO.getEgressoId()))
+    when(this.egressRepository.findById(positionDTO.getEgressId()))
       .thenReturn(Optional.of(egressMock));
 
     when(this.positionRepository.save(any(Position.class)))
@@ -69,7 +69,7 @@ public class CreatePositionUseCaseTest {
     Position result = this.sut.execute(positionDTO);
 
     assertEquals(result.getId(), positionMock.getId());
-    assertEquals(result.getEgress().getId(), positionDTO.getEgressoId());
+    assertEquals(result.getEgress().getId(), positionDTO.getEgressId());
     assertEquals(result.getDescription(), positionDTO.getDescription());
   }
 
@@ -78,7 +78,7 @@ public class CreatePositionUseCaseTest {
   public void egressNotFound() {
     // DTO
     PositionDTO positionDTO = PositionDTO.builder()
-      .egressoId(UUID.randomUUID())
+      .egressId(UUID.randomUUID())
       .description("Position Description")
       .location("Location Name")
       .startYear(2000)
@@ -86,7 +86,7 @@ public class CreatePositionUseCaseTest {
       .build();
 
     // Mocks
-    when(this.egressRepository.findById(positionDTO.getEgressoId()))
+    when(this.egressRepository.findById(positionDTO.getEgressId()))
       .thenReturn(Optional.empty());
 
     // Test

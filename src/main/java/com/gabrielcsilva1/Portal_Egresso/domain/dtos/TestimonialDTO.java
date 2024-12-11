@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.gabrielcsilva1.Portal_Egresso.infra.validation.ValidUUID;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,5 +20,6 @@ public class TestimonialDTO {
   @ValidUUID
   private UUID egressId;
 
+  @NotBlank
   private String text;
 }

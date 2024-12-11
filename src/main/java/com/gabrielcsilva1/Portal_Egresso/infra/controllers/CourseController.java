@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.usecases.CreateCourseUseCase;
+import com.gabrielcsilva1.Portal_Egresso.domain.usecases.RegisterEgressInCourseUseCase;
 
 import jakarta.validation.Valid;
 
@@ -19,9 +21,19 @@ public class CourseController {
   @Autowired
   private CreateCourseUseCase createCourseUseCase;
 
+  @Autowired
+  private RegisterEgressInCourseUseCase registerEgressInCourseUseCase;
+
   @PostMapping
   public ResponseEntity<Object> save(@Valid @RequestBody CourseDTO courseDTO) {
     this.createCourseUseCase.execute(courseDTO);
+    return ResponseEntity.status(HttpStatus.CREATED).body(null);
+  }
+
+  @PostMapping
+  @RequestMapping("/egress")
+  public ResponseEntity<Object> registerEgressInCourse(@Valid @RequestBody EgressCourseDTO egressCourseDTO) {
+    this.registerEgressInCourseUseCase.execute(egressCourseDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 }

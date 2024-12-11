@@ -15,7 +15,7 @@ import lombok.Data;
 public class PositionDTO {
   @NotNull
   @ValidUUID
-  private UUID egressoId;
+  private UUID egressId;
   
   @NotBlank
   private String description;
