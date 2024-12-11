@@ -1,6 +1,7 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.usecases;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.PositionDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Position;
@@ -8,9 +9,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.PositionRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.EgressNotFoundException;
 
-import jakarta.persistence.Entity;
-
-@Entity
+@Service
 public class CreatePositionUseCase {
   @Autowired
   private PositionRepository positionRepository;
