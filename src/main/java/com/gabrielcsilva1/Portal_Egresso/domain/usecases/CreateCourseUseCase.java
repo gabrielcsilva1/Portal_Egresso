@@ -17,7 +17,7 @@ public class CreateCourseUseCase {
   @Autowired
   private CoordinatorRepository coordinatorRepository;
 
-  Course execute(CourseDTO courseDTO) {
+  public Course execute(CourseDTO courseDTO) {
     var coordinator = this.coordinatorRepository.findById(courseDTO.getCoordinatorId());
 
     if (coordinator.isEmpty()) {

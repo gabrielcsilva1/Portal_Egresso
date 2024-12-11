@@ -40,7 +40,7 @@ public class CreatePositionUseCaseTest {
     PositionDTO positionDTO = PositionDTO.builder()
       .egressoId(UUID.randomUUID())
       .description("Position Description")
-      .company("Company Name")
+      .location("Location Name")
       .startYear(2000)
       .endYear(2020)
       .build();
@@ -54,7 +54,7 @@ public class CreatePositionUseCaseTest {
       .id(UUID.randomUUID())
       .egress(egressMock)
       .description(positionDTO.getDescription())
-      .company(positionDTO.getCompany())
+      .location(positionDTO.getLocation())
       .startYear(positionDTO.getStartYear())
       .endYear(positionDTO.getEndYear())
       .build();
@@ -80,7 +80,7 @@ public class CreatePositionUseCaseTest {
     PositionDTO positionDTO = PositionDTO.builder()
       .egressoId(UUID.randomUUID())
       .description("Position Description")
-      .company("Company Name")
+      .location("Location Name")
       .startYear(2000)
       .endYear(2020)
       .build();

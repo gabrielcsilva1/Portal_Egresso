@@ -17,7 +17,7 @@ public class PositionDTO {
   private String description;
 
   @NotBlank
-  private String company;
+  private String location;
 
   @Positive
   @NotNull

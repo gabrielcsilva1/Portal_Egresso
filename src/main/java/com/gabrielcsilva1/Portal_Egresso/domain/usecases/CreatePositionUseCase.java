@@ -28,7 +28,7 @@ public class CreatePositionUseCase {
     var position = Position.builder()
       .egress(egress.get())
       .description(positionDTO.getDescription())
-      .company(positionDTO.getCompany())
+      .location(positionDTO.getLocation())
       .startYear(positionDTO.getStartYear())
       .endYear(positionDTO.getEndYear())
       .build();

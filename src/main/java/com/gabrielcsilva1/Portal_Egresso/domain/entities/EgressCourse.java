@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -31,7 +30,6 @@ public class EgressCourse {
   @JoinColumn(name = "egress_id", nullable = false)
   private Egress egress;
 
-  @Positive
   @Column(name = "start_year", nullable = false)
   private Integer startYear;
 

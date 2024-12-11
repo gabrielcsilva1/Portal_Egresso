@@ -12,7 +12,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,10 +36,8 @@ public class Course {
   private Set<EgressCourse> egressCourse;
 
   @Column(nullable = false)
-  @NotBlank
   private String name;
 
   @Column(nullable = false)
-  @NotBlank
   private String level;
 }
