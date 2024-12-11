@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.CoordinatorNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.CourseNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.EgressAlreadyExistsException;
+import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.InvalidEndYearException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -34,6 +38,34 @@ public class GlobalExceptionHandler {
   public ResponseEntity<Map<String, String>> handleCoordinatorNotFoundException(CoordinatorNotFoundException exception) {
     Map<String, String> error = new HashMap<>();
     error.put("error", "Bad request");
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+  }
+
+  @ExceptionHandler(CourseNotFoundException.class)
+  public ResponseEntity<Map<String, String>> handleCourseNotFoundException(CourseNotFoundException exception) {
+    Map<String, String> error = new HashMap<>();
+    error.put("error", "Bad request");
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+  }
+
+  @ExceptionHandler(EgressNotFoundException.class)
+  public ResponseEntity<Map<String, String>> handleEgressNotFoundException(EgressNotFoundException exception) {
+    Map<String, String> error = new HashMap<>();
+    error.put("error", "Bad request");
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+  }
+
+  @ExceptionHandler(EgressAlreadyExistsException.class)
+  public ResponseEntity<Map<String, String>> handleEgressAlreadyExistsException(EgressAlreadyExistsException exception) {
+    Map<String, String> error = new HashMap<>();
+    error.put("error", exception.getMessage());
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+  }
+
+  @ExceptionHandler(InvalidEndYearException.class)
+  public ResponseEntity<Map<String, String>> handleInvalidEndYearException(InvalidEndYearException exception) {
+    Map<String, String> error = new HashMap<>();
+    error.put("error", exception.getMessage());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
   }
 
