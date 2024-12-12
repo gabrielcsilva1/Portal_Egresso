@@ -8,21 +8,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.EgressService;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.PositionDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.PositionService;
 
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/egress")
-public class EgressController { 
+public class PositionController {
   @Autowired
-  EgressService egressService;
+  private PositionService positionService;
 
   @PostMapping
-  public ResponseEntity<Object> createEgress(@Valid @RequestBody EgressDTO egressDTO) {
-    this.egressService.createEgress(egressDTO);
-
+  @RequestMapping("/egress/position")
+  public ResponseEntity<Object> registerEgressPosition(@Valid @RequestBody PositionDTO positionDTO) {
+    this.positionService.registerEgressPosition(positionDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 }
