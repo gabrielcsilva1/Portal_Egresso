@@ -13,6 +13,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressCourseReposit
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CourseNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressAlreadyTakenTheCourseException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
 
@@ -59,6 +60,14 @@ public class CourseService {
       throw new CourseNotFoundException();
     }
 
+    boolean egressAlreadyTakenTheCourse = this.egressCourseRepository
+      .findByEgressAndCourse(egress.get(), course.get())
+      .isPresent();
+
+    if (egressAlreadyTakenTheCourse) {
+      throw new EgressAlreadyTakenTheCourseException(course.get().getName());
+    }
+    
     boolean isStartYearGreaterThanEndYear = false;
 
     if (egressCourseDTO.getEndYear() != null) {

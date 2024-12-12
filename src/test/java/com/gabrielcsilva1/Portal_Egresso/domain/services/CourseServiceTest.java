@@ -27,6 +27,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressCourseReposit
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CourseNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressAlreadyTakenTheCourseException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
 
@@ -222,6 +223,42 @@ public class CourseServiceTest {
 
     // Test
     assertThrows(InvalidEndYearException.class, () -> {
+      sut.registerEgressInCourse(egressCourseDTO);
+    });
+  }
+
+  @Test
+  @DisplayName("should not be able to register an egress twice in the same course")
+  public void register_egress_in_course_egress_already_taken_the_course() {
+    // DTO
+    var egressCourseDTO = EgressCourseDTO.builder()
+      .egressId(UUID.randomUUID())
+      .courseId(UUID.randomUUID())
+      .startYear(Integer.valueOf(2000))
+      .endYear(Integer.valueOf(2020))
+      .build();
+
+    // Mocks
+    Course courseMock = Course.builder()
+      .id(egressCourseDTO.getCourseId())
+      .build();
+
+    Egress egressMock = Egress.builder()
+      .id(egressCourseDTO.getEgressId())
+      .build();
+
+    EgressCourse egressCourseMock = new EgressCourse();
+
+    // Mock behavior
+    when(courseRepository.findById(egressCourseDTO.getCourseId()))
+      .thenReturn(Optional.of(courseMock));
+    when(egressRepository.findById(egressCourseDTO.getEgressId()))
+      .thenReturn(Optional.of(egressMock));
+    when(egressCourseRepository.findByEgressAndCourse(egressMock, courseMock))
+      .thenReturn(Optional.of(egressCourseMock));
+
+    // Test
+    assertThrows(EgressAlreadyTakenTheCourseException.class, () -> {
       sut.registerEgressInCourse(egressCourseDTO);
     });
   }

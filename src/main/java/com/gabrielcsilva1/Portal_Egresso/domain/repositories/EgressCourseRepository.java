@@ -10,5 +10,5 @@ import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.EgressCourse;
 
 public interface EgressCourseRepository extends JpaRepository<EgressCourse, UUID>{
-  Optional<EgressCourse> findByAlumnusAndCourse(Egress egress, Course course);
+  Optional<EgressCourse> findByEgressAndCourse(Egress egress, Course course);
 }

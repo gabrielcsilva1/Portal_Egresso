@@ -109,8 +109,10 @@ public class PositionServiceTest {
       .build();
 
     // Mocks
+    Egress egressMock = new Egress();
+
     when(this.egressRepository.findById(positionDTO.getEgressId()))
-      .thenReturn(Optional.empty());
+      .thenReturn(Optional.of(egressMock));
 
     // Test
     assertThrows(InvalidEndYearException.class, () -> {
