@@ -38,7 +38,7 @@ public class EgressServiceTest {
 
   @Test
   @DisplayName("should be able to create a new egress.")
-  public void save_egress_success() {
+  public void create_egress_success() {
     // DTO
     EgressDTO egressDTO = EgressDTO.builder()
       .email("johnDoe@example.com")
@@ -68,7 +68,7 @@ public class EgressServiceTest {
 
   @Test
   @DisplayName("should not be able to create a new egress with a duplicate email address.")
-  public void save_egress_email_already_exists_exception() {
+  public void create_egress_email_already_exists_exception() {
     // DTO
     EgressDTO egressDTO = EgressDTO.builder()
       .email("johnDoe@example.com")

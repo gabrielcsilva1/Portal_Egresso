@@ -49,7 +49,7 @@ public class CourseServiceTest {
 
   @Test
   @DisplayName("should be able to create a new course")
-  public void save_course_success() {
+  public void create_course_success() {
     // DTO
     var courseDTO = CourseDTO.builder()
       .coordinatorId(UUID.randomUUID())
@@ -83,7 +83,7 @@ public class CourseServiceTest {
 
   @Test
   @DisplayName("should not be able to create a new course with a coordinator identifier not valid")
-  public void save_course_coordinator_not_found_exception() {
+  public void create_course_coordinator_not_found_exception() {
      // DTO
      var courseDTO = CourseDTO.builder()
      .coordinatorId(UUID.randomUUID())
@@ -195,7 +195,7 @@ public class CourseServiceTest {
   }
 
   @Test
-  @DisplayName("should not be able to register a egress in a course with invalid end year")
+  @DisplayName("should not be able to register an egress in the course with an end year before the start year")
   public void register_egress_in_course_invalid_end_year() {
     // DTO
     var egressCourseDTO = EgressCourseDTO.builder()

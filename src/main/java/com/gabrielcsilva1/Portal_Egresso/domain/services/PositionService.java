@@ -1,7 +1,5 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.services;
 
-import java.time.LocalDate;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,14 +26,12 @@ public class PositionService {
     }
 
     boolean isStartYearGreaterThanEndYear = false;
-    boolean isEndYearGreaterThanCurrentYear = false;
 
     if (positionDTO.getEndYear() != null) {
       isStartYearGreaterThanEndYear = positionDTO.getStartYear().intValue() > positionDTO.getEndYear().intValue();
-      isEndYearGreaterThanCurrentYear = positionDTO.getEndYear().intValue() > LocalDate.now().getYear();
     }
 
-    if (isStartYearGreaterThanEndYear || isEndYearGreaterThanCurrentYear) {
+    if (isStartYearGreaterThanEndYear) {
       throw new InvalidEndYearException();
     }
 

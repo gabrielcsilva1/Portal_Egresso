@@ -73,7 +73,7 @@ public class TestimonialServiceTest {
 
   @Test
   @DisplayName("should not be able to create a testimonial from a egress that does not exist")
-  public void save_testimonial_egress_not_found() {
+  public void register_egress_testimonial_egress_not_found() {
     // DTO
     var testimonialDTO = TestimonialDTO.builder()
     .egressId(UUID.randomUUID())

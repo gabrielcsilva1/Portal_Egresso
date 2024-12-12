@@ -21,6 +21,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.entities.Position;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.PositionRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
 
 @ExtendWith(MockitoExtension.class)
 public class PositionServiceTest {
@@ -35,7 +36,7 @@ public class PositionServiceTest {
   
   @Test
   @DisplayName("should be able to create a new position")
-  public void save_position_success() {
+  public void register_egress_success() {
     // DTO
     PositionDTO positionDTO = PositionDTO.builder()
       .egressId(UUID.randomUUID())
@@ -75,7 +76,7 @@ public class PositionServiceTest {
 
   @Test
   @DisplayName("should not be able to create a new position if the egress does not exist")
-  public void save_position_egress_not_found() {
+  public void register_egress_position_egress_not_found() {
     // DTO
     PositionDTO positionDTO = PositionDTO.builder()
       .egressId(UUID.randomUUID())
@@ -91,6 +92,28 @@ public class PositionServiceTest {
 
     // Test
     assertThrows(EgressNotFoundException.class, () -> {
+      sut.registerEgressPosition(positionDTO);
+    });
+  }
+
+  @Test
+  @DisplayName("should not be able to create a new position with an end year before the start year")
+  public void register_egress_position_invalid_end_year() {
+    // DTO
+    PositionDTO positionDTO = PositionDTO.builder()
+      .egressId(UUID.randomUUID())
+      .description("Position Description")
+      .location("Location Name")
+      .startYear(2020)
+      .endYear(2000)
+      .build();
+
+    // Mocks
+    when(this.egressRepository.findById(positionDTO.getEgressId()))
+      .thenReturn(Optional.empty());
+
+    // Test
+    assertThrows(InvalidEndYearException.class, () -> {
       sut.registerEgressPosition(positionDTO);
     });
   }

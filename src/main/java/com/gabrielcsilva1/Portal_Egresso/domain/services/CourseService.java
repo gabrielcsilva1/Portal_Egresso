@@ -1,7 +1,5 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.services;
 
-import java.time.LocalDate;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,14 +60,12 @@ public class CourseService {
     }
 
     boolean isStartYearGreaterThanEndYear = false;
-    boolean isEndYearGreaterThanCurrentYear = false;
 
     if (egressCourseDTO.getEndYear() != null) {
       isStartYearGreaterThanEndYear = egressCourseDTO.getStartYear().intValue() > egressCourseDTO.getEndYear().intValue();
-      isEndYearGreaterThanCurrentYear = egressCourseDTO.getEndYear().intValue() > LocalDate.now().getYear();
     }
 
-    if (isStartYearGreaterThanEndYear || isEndYearGreaterThanCurrentYear) {
+    if (isStartYearGreaterThanEndYear) {
       throw new InvalidEndYearException();
     }
 
