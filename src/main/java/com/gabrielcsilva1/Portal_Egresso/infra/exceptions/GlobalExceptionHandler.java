@@ -10,11 +10,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.CoordinatorNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.CourseNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.EgressAlreadyExistsException;
-import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.EgressNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.InvalidEndYearException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CourseNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressAlreadyExistsException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

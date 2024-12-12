@@ -1,31 +1,54 @@
-package com.gabrielcsilva1.Portal_Egresso.domain.usecases;
+package com.gabrielcsilva1.Portal_Egresso.domain.services;
 
 import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressCourseDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.EgressCourse;
+import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressCourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.CourseNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.EgressNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.InvalidEndYearException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CourseNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
 
 @Service
-public class RegisterEgressInCourseUseCase {
-  @Autowired
-  private EgressRepository egressRepository;
-
+public class CourseService {
   @Autowired
   private CourseRepository courseRepository;
 
   @Autowired
+  private CoordinatorRepository coordinatorRepository;
+
+  @Autowired
+  private EgressRepository egressRepository;
+
+  @Autowired
   private EgressCourseRepository egressCourseRepository;
 
-  public EgressCourse execute(EgressCourseDTO egressCourseDTO) {
+  public Course createCourse(CourseDTO courseDTO) {
+    var coordinator = this.coordinatorRepository.findById(courseDTO.getCoordinatorId());
+
+    if (coordinator.isEmpty()) {
+      throw new CoordinatorNotFoundException();
+    }
+
+    var course = Course.builder()
+      .coordinator(coordinator.get())
+      .name(courseDTO.getName())
+      .level(courseDTO.getLevel())
+      .build();
+
+    return this.courseRepository.save(course);
+  }
+
+  public EgressCourse registerEgressInCourse(EgressCourseDTO egressCourseDTO) {
     var egress = this.egressRepository.findById(egressCourseDTO.getEgressId());
 
     if (egress.isEmpty()) {

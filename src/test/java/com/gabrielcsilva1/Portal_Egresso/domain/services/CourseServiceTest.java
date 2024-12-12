@@ -1,4 +1,4 @@
-package com.gabrielcsilva1.Portal_Egresso.domain.usecases;
+package com.gabrielcsilva1.Portal_Egresso.domain.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -15,24 +15,31 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressCourseDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.EgressCourse;
+import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressCourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.CourseNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.EgressNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions.InvalidEndYearException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CourseNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
 
 @ExtendWith(MockitoExtension.class)
-public class RegisterEgressInCourseUseCaseTest {
+public class CourseServiceTest {
   @InjectMocks
-  private RegisterEgressInCourseUseCase sut;
+  private CourseService sut;
 
   @Mock
   private CourseRepository courseRepository;
+
+  @Mock
+  private CoordinatorRepository coordinatorRepository;
 
   @Mock
   private EgressRepository egressRepository;
@@ -41,8 +48,62 @@ public class RegisterEgressInCourseUseCaseTest {
   private EgressCourseRepository egressCourseRepository;
 
   @Test
+  @DisplayName("should be able to create a new course")
+  public void save_course_success() {
+    // DTO
+    var courseDTO = CourseDTO.builder()
+      .coordinatorId(UUID.randomUUID())
+      .name("Course Name")
+      .level("Graduation")
+      .build();
+
+    // Mocks
+    var coordinatorMock = Coordinator.builder()
+      .id(courseDTO.getCoordinatorId())
+      .build();
+    
+    var courseMock = Course.builder()
+      .coordinator(coordinatorMock)
+      .name(courseDTO.getName())
+      .level(courseDTO.getLevel())
+      .build();
+
+    when(this.coordinatorRepository.findById(coordinatorMock.getId()))
+      .thenReturn(Optional.of(coordinatorMock));
+
+    when(this.courseRepository.save(any(Course.class)))
+      .thenReturn(courseMock);
+
+    // Test
+    Course result = this.sut.createCourse(courseDTO);
+
+    assertEquals(result.getId(), courseMock.getId());
+    assertEquals(result.getCoordinator().getId(), courseDTO.getCoordinatorId());
+  }
+
+  @Test
+  @DisplayName("should not be able to create a new course with a coordinator identifier not valid")
+  public void save_course_coordinator_not_found_exception() {
+     // DTO
+     var courseDTO = CourseDTO.builder()
+     .coordinatorId(UUID.randomUUID())
+     .name("Course Name")
+     .level("Graduation")
+     .build();
+
+   // Mocks
+   when(this.coordinatorRepository.findById(courseDTO.getCoordinatorId()))
+     .thenReturn(Optional.empty());
+
+   // Test
+   assertThrows(CoordinatorNotFoundException.class, () -> {
+      this.sut.createCourse(courseDTO);
+   });
+  }
+
+  @Test
   @DisplayName("should be able to register a egress in a course")
-  public void success() {
+  public void register_egress_in_course_success() {
     // DTO
     var egressCourseDTO = EgressCourseDTO.builder()
       .egressId(UUID.randomUUID())
@@ -77,7 +138,7 @@ public class RegisterEgressInCourseUseCaseTest {
       .thenReturn(egressCourseMock);
 
     // Test
-    EgressCourse result = sut.execute(egressCourseDTO);
+    EgressCourse result = sut.registerEgressInCourse(egressCourseDTO);
 
     assertEquals(result.getId(), egressCourseMock.getId());
     assertEquals(result.getCourse().getId(), egressCourseDTO.getCourseId());
@@ -86,7 +147,7 @@ public class RegisterEgressInCourseUseCaseTest {
 
   @Test
   @DisplayName("should not be able to register a invalid egress in a course")
-  public void egressNotFound() {
+  public void register_egress_in_course_egress_not_found() {
     // DTO
     var egressCourseDTO = EgressCourseDTO.builder()
       .egressId(UUID.randomUUID())
@@ -101,13 +162,13 @@ public class RegisterEgressInCourseUseCaseTest {
 
     // Test
     assertThrows(EgressNotFoundException.class, () -> {
-      sut.execute(egressCourseDTO) ;
+      sut.registerEgressInCourse(egressCourseDTO) ;
     });
   }
 
   @Test
   @DisplayName("should not be able to register a egress in a invalid course")
-  public void courseNotFound() {
+  public void register_egress_in_course_course_not_found() {
     // DTO
     var egressCourseDTO = EgressCourseDTO.builder()
       .egressId(UUID.randomUUID())
@@ -129,13 +190,13 @@ public class RegisterEgressInCourseUseCaseTest {
 
     // Test
     assertThrows(CourseNotFoundException.class, () -> {
-      sut.execute(egressCourseDTO);
+      sut.registerEgressInCourse(egressCourseDTO);
     });
   }
 
   @Test
   @DisplayName("should not be able to register a egress in a course with invalid end year")
-  public void invalidEndYear() {
+  public void register_egress_in_course_invalid_end_year() {
     // DTO
     var egressCourseDTO = EgressCourseDTO.builder()
       .egressId(UUID.randomUUID())
@@ -161,7 +222,7 @@ public class RegisterEgressInCourseUseCaseTest {
 
     // Test
     assertThrows(InvalidEndYearException.class, () -> {
-      sut.execute(egressCourseDTO);
+      sut.registerEgressInCourse(egressCourseDTO);
     });
   }
 }

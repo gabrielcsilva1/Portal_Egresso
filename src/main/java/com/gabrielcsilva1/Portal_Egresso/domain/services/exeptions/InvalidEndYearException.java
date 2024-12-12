@@ -1,4 +1,4 @@
-package com.gabrielcsilva1.Portal_Egresso.domain.usecases.exeptions;
+package com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions;
 
 public class InvalidEndYearException extends RuntimeException {
   public InvalidEndYearException() {
