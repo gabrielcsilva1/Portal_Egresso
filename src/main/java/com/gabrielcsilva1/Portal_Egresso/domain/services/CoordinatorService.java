@@ -25,6 +25,8 @@ public class CoordinatorService {
     if (isInvalidPassword) {
       throw new InvalidCredentialsException();
     }
+
+    // TODO: generate access_token
     return coordinator;
   }
 }
