@@ -30,6 +30,9 @@ public class Egress {
 
   @OneToMany(mappedBy = "egress")
   private Set<EgressCourse> egressCourse;
+
+  @OneToMany(mappedBy = "egress")
+  private Set<Position> positions;
   
   @Column(nullable = false)
   private String name;

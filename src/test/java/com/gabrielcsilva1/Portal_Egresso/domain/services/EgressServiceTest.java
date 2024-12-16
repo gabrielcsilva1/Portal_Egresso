@@ -1,6 +1,7 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -21,6 +22,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.PositionRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.TestimonialRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressAlreadyExistsException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class EgressServiceTest {
@@ -89,5 +91,39 @@ public class EgressServiceTest {
     assertThrows(EgressAlreadyExistsException.class, () -> {
       this.sut.createEgress(egressDTO);
     });
+  }
+
+  @Test
+  @DisplayName("should be able to get a egress by id.")
+  public void get_egress__by_id_success() {
+    // Mocks
+    Egress mockEgress = Egress.builder()
+      .id(UUID.randomUUID())
+      .name("John Doe")
+      .email("johndoe@example.com")
+      .build();
+
+    when(egressRepository.findById(mockEgress.getId()))
+      .thenReturn(Optional.of(mockEgress));
+
+    // Test
+    Egress result = sut.getEgressById(mockEgress.getId());
+
+    assertNotNull(result);
+    assertEquals(result.getId(), mockEgress.getId());
+  }
+
+  @Test
+  @DisplayName("should not be able to get a egress with a invalid id.")
+  public void get_egress__by_id_invalid_id() {
+    // Id
+    UUID invalidId = UUID.randomUUID();
+
+    // Mocks
+    when(egressRepository.findById(invalidId))
+      .thenReturn(Optional.empty());
+
+    // Test
+    assertThrows(EgressNotFoundException.class, () -> sut.getEgressById(invalidId));
   }
 }
