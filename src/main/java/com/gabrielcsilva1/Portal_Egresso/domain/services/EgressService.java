@@ -1,8 +1,10 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.services;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressDTO;
@@ -34,5 +36,9 @@ public class EgressService {
       .orElseThrow(() -> new EgressNotFoundException());
 
     return egress;
+  }
+
+  public List<Egress> fetchEgresses(Specification<Egress> queryFilters) {
+    return this.egressRepository.findAll(queryFilters);
   }
 }
