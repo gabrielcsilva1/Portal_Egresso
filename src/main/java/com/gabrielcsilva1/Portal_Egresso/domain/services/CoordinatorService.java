@@ -13,7 +13,6 @@ public class CoordinatorService {
   @Autowired
   private CoordinatorRepository coordinatorRepository;
 
-  @Autowired
   private IPasswordHasher passwordHasher;
 
   public Coordinator login(String login, String password) {
