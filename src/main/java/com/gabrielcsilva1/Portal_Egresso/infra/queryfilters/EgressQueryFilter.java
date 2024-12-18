@@ -1,4 +1,4 @@
-package com.gabrielcsilva1.Portal_Egresso.domain.queryfilters;
+package com.gabrielcsilva1.Portal_Egresso.infra.queryfilters;
 
 import static com.gabrielcsilva1.Portal_Egresso.domain.specifications.EgressFilterSpecification.*;
 

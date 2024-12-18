@@ -5,6 +5,8 @@ import org.springframework.util.ObjectUtils;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
 
+import jakarta.persistence.criteria.JoinType;
+
 public class EgressFilterSpecification {
   public static Specification<Egress> didEgressTakenCourseInTheYear(Integer year) {
     return (root, _, builder) -> {
@@ -60,7 +62,7 @@ public class EgressFilterSpecification {
         return null;
       }
 
-      var positionJoin = root.join("positions");
+      var positionJoin = root.join("positions", JoinType.LEFT);
       var positionDescriptionInLowerCase = builder.lower(positionJoin.get("description"));
 
       return builder.like(positionDescriptionInLowerCase, "%" + positionName.toLowerCase() + "%");

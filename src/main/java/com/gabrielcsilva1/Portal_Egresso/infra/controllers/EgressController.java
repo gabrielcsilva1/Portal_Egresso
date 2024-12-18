@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
-import com.gabrielcsilva1.Portal_Egresso.domain.queryfilters.EgressQueryFilter;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.EgressService;
 import com.gabrielcsilva1.Portal_Egresso.infra.presenters.EgressPresenter;
+import com.gabrielcsilva1.Portal_Egresso.infra.queryfilters.EgressQueryFilter;
 
 import jakarta.validation.Valid;
 
