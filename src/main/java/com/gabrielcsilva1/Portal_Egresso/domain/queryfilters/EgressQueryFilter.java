@@ -12,12 +12,17 @@ import lombok.Data;
 @Data
 @Builder
 public class EgressQueryFilter {
-  private String name;
+  /*
+   * query - name or position name
+   */
+  private String query;
   private String courseName;
   private Integer year;
 
   public Specification<Egress> toSpecification() {
-    return isNameEqualTo(name)
+    var isNameOrPositionEqualToQuery = isNameEqualTo(query).or(didEgressHoldPositionNamed(query));
+
+    return isNameOrPositionEqualToQuery
       .and(didEgressTakenCourseInTheYear(year))
       .and(didEgressTakenTheCourseByName(courseName));
   }
