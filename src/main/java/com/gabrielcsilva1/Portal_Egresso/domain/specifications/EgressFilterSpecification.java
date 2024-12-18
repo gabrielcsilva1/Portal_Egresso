@@ -53,4 +53,17 @@ public class EgressFilterSpecification {
       return builder.like(courseNameInLowerCase, "%" + courseName.toLowerCase() + "%");
     };
   }
+
+  public static Specification<Egress> didEgressHoldPositionNamed(String positionName) {
+    return (root, _, builder) -> {
+      if (ObjectUtils.isEmpty(positionName)) {
+        return null;
+      }
+
+      var positionJoin = root.join("positions");
+      var positionDescriptionInLowerCase = builder.lower(positionJoin.get("description"));
+
+      return builder.like(positionDescriptionInLowerCase, "%" + positionName.toLowerCase() + "%");
+    };
+  }
 }
