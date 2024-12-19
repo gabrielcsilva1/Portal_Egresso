@@ -1,5 +1,6 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.services;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,10 @@ public class CourseService {
       .build();
 
     return this.courseRepository.save(course);
+  }
+
+  public List<Course> fetchCourses() {
+    return this.courseRepository.findAllByOrderByNameAsc();
   }
 
   public EgressCourse registerEgressInCourse(EgressCourseDTO egressCourseDTO) {
