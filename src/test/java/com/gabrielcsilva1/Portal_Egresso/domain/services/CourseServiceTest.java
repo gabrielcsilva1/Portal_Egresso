@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressCourseDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.UpdateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
@@ -261,5 +262,45 @@ public class CourseServiceTest {
     assertThrows(EgressAlreadyTakenTheCourseException.class, () -> {
       sut.registerEgressInCourse(egressCourseDTO);
     });
+  }
+
+  @Test
+  @DisplayName("should be able to update a course")
+  public void update_course_success() {
+    UpdateCourseDTO courseDTO = UpdateCourseDTO.builder()
+      .name("Ciências da computação")
+      .level("Pós-graduação")
+      .build();
+
+    Course courseMock = Course.builder()
+      .id(UUID.randomUUID())
+      .name("Informática")
+      .level("Graduação")
+      .build();
+
+    when(courseRepository.findById(courseMock.getId()))
+      .thenReturn(Optional.of(courseMock));
+
+    when(courseRepository.save(any(Course.class)))
+      .thenAnswer(invocation -> invocation.getArgument(0));
+
+    Course result = sut.updateCourse(courseMock.getId(), courseDTO);
+
+    assertEquals(result.getName(), courseMock.getName());
+    assertEquals(result.getLevel(), courseDTO.getLevel());
+  }
+
+  @Test
+  @DisplayName("should not be able to update a course with wrong id")
+  public void update_course_with_invalid_course_id() {
+    UpdateCourseDTO courseDTO = UpdateCourseDTO.builder()
+      .name("Ciências da computação")
+      .level("Pós-graduação")
+      .build();
+
+    when(courseRepository.findById(any(UUID.class)))
+      .thenReturn(Optional.empty());
+
+    assertThrows(CourseNotFoundException.class, () -> sut.updateCourse(UUID.randomUUID(), courseDTO));
   }
 }

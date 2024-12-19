@@ -1,10 +1,13 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.services;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressCourseDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.UpdateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.EgressCourse;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
@@ -86,5 +89,22 @@ public class CourseService {
       .build();
 
     return this.egressCourseRepository.save(egressCourse);
+  }
+
+  public Course updateCourse(UUID id, UpdateCourseDTO courseDTO) {
+    Course course = this.courseRepository.findById(id)
+      .orElseThrow(() -> new CourseNotFoundException());
+
+    course.setName(courseDTO.getName());
+    course.setLevel(courseDTO.getLevel());
+
+    return this.courseRepository.save(course);
+  }
+
+  public void deleteCourse(UUID id) {
+    Course course = this.courseRepository.findById(id)
+      .orElseThrow(() -> new CourseNotFoundException());
+
+    this.courseRepository.delete(course);
   }
 }

@@ -16,7 +16,8 @@ Projeto da disciplina Laboratório de Programação (2024.2). O Portal de Egress
 - [✔] Deve ser possível que um egresso registre mais de um curso
 - [✔] Deve ser possível cadastrar cargos do egresso
 - [✔] Deve ser possível cadastrar depoimentos do egresso
-- [ ] Deve ser possível listar egressos por curso, ano, nome.
+- [✔] Deve ser possível listar egressos por curso, ano, nome.
+- [✔] Deve ser possível listar egressos por cargo.
 - [✔] Deve ser possível consultar um egresso com seus respectivos cargos.
 - [✔] Deve ser possível listar depoimentos recentes e por ano.
 
