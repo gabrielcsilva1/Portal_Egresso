@@ -14,12 +14,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "egress")
-@Data
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

@@ -1,4 +1,4 @@
-package com.gabrielcsilva1.Portal_Egresso.infra.exceptions;
+package com.gabrielcsilva1.Portal_Egresso.infra.handlers;
 
 import java.util.HashMap;
 import java.util.Map;
