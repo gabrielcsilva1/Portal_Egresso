@@ -1,6 +1,7 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.PositionDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.position.UpdatePositionDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Position;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
@@ -119,4 +121,33 @@ public class PositionServiceTest {
       sut.registerEgressPosition(positionDTO);
     });
   }
+
+  @Test
+  @DisplayName("should be able to update the egress position")
+  public void update_egress_position_success() {
+    UpdatePositionDTO positionDTO = UpdatePositionDTO.builder()
+      .description("new description")
+      .location("new location")
+      .startYear(2010)
+      .endYear(2020)
+      .build();
+
+    Position positionMock = Position.builder()
+      .id(UUID.randomUUID())
+      .build();
+
+    when(positionRepository.findById(any(UUID.class)))
+      .thenReturn(Optional.of(positionMock));
+    when(positionRepository.save(any(Position.class)))
+      .thenAnswer(invocation -> invocation.getArgument(0));
+
+    Position result = sut.updateEgressPosition(positionMock.getId(), positionDTO);
+
+    assertNotNull(result);
+    assertEquals(result.getDescription(), positionDTO.getDescription());
+    assertEquals(result.getLocation(), positionDTO.getLocation());
+    assertEquals(result.getStartYear(), positionDTO.getStartYear());
+    assertEquals(result.getEndYear(), positionDTO.getEndYear());
+  }
+
 }

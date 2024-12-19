@@ -161,4 +161,24 @@ public class TestimonialServiceTest {
     assertThat(result.getContent()).hasSize(1);
     assertThat(result.getContent().get(0).getText()).isEqualTo("testimonial test 2022");
   }
+
+  @Test
+  @DisplayName("should be able to update a egress testimonial")
+  public void update_egress_testimonial_success() {
+    String newText = "testimonial text";
+
+    Testimonial testimonialMock = Testimonial.builder()
+      .id(UUID.randomUUID())
+      .build();
+    
+    when(testimonialRepository.findById(any(UUID.class)))
+      .thenReturn(Optional.of(testimonialMock));
+
+    when(testimonialRepository.save(any(Testimonial.class)))
+      .thenAnswer(invocation -> invocation.getArgument(0));
+    
+    Testimonial result = sut.updateEgressTestimonial(testimonialMock.getId(), newText);
+
+    assertEquals(result.getText(), newText);
+  }
 }

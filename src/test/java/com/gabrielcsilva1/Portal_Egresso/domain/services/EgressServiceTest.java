@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.egress.UpdateEgressDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.PositionRepository;
@@ -125,5 +126,59 @@ public class EgressServiceTest {
 
     // Test
     assertThrows(EgressNotFoundException.class, () -> sut.getEgressById(invalidId));
+  }
+
+  @Test
+  @DisplayName("should be able to update a egress")
+  public void update_egress_success() {
+    UpdateEgressDTO egressDTO = UpdateEgressDTO.builder()
+      .email("newEgress@example.com")
+      .name("New name for Egress")
+      .avatarUrl("new avatar")
+      .curriculum("new curriculum")
+      .description("new description")
+      .linkedin("new linkedin")
+      .instagram("new instagram")
+      .build();
+    
+      Egress egressMock = Egress.builder()
+        .id(UUID.randomUUID())
+        .name("John Doe")
+        .email("johndoe@example.com")
+        .build();
+
+      when(egressRepository.findById(egressMock.getId()))
+        .thenReturn(Optional.of(egressMock));
+
+      when(egressRepository.save(any(Egress.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
+
+      Egress result = sut.updateEgress(egressMock.getId(), egressDTO);
+
+      assertNotNull(result);
+      assertEquals(egressDTO.getName(), result.getName());
+      assertEquals(egressDTO.getEmail(), result.getEmail());
+      assertEquals(egressDTO.getAvatarUrl(), result.getAvatarUrl());
+      assertEquals(egressDTO.getCurriculum(), result.getCurriculum());
+      assertEquals(egressDTO.getDescription(), result.getDescription());
+      assertEquals(egressDTO.getLinkedin(), result.getLinkedin());
+      assertEquals(egressDTO.getInstagram(), result.getInstagram());
+
+  }
+
+  @Test
+  @DisplayName("should not be able to update a egress with invalid id")
+  public void update_egress_with_invalid_id() {
+    UpdateEgressDTO egressDTO = UpdateEgressDTO.builder()
+      .email("newEgress@example.com")
+      .name("New name for Egress")
+      .build();
+
+      when(egressRepository.findById(any(UUID.class)))
+        .thenReturn(Optional.empty());
+
+      assertThrows(EgressNotFoundException.class, () -> {
+        sut.updateEgress(UUID.randomUUID(), egressDTO);
+      });
   }
 }

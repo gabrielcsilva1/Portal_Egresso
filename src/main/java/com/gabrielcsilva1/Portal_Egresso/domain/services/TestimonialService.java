@@ -1,5 +1,7 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.services;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +13,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.TestimonialRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.ResourceNotFoundException;
 
 @Service
 public class TestimonialService {
@@ -52,5 +55,20 @@ public class TestimonialService {
     }
 
     return testimonials;
+  }
+
+  public Testimonial updateEgressTestimonial(UUID id, String text) {
+    Testimonial testimonial = this.testimonialRepository.findById(id)
+      .orElseThrow(() -> new ResourceNotFoundException());
+    
+    testimonial.setText(text);
+    return this.testimonialRepository.save(testimonial);
+  }
+
+  public void deleteEgressTestimonial(UUID id) {
+    Testimonial testimonial = this.testimonialRepository.findById(id)
+      .orElseThrow(() -> new ResourceNotFoundException());
+    
+    this.testimonialRepository.delete(testimonial);
   }
 }

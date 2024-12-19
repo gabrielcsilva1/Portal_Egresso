@@ -17,6 +17,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressAlready
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidCredentialsException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.ResourceNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -34,6 +35,13 @@ public class GlobalExceptionHandler {
       });
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+  }
+
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException exception) {
+    Map<String, String> error = new HashMap<>();
+    error.put("error", exception.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
   }
 
   @ExceptionHandler(CoordinatorNotFoundException.class)

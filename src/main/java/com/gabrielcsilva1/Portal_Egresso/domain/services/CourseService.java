@@ -14,6 +14,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorReposito
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressCourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.ResourceNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CourseNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressAlreadyTakenTheCourseException;
@@ -89,6 +90,13 @@ public class CourseService {
       .build();
 
     return this.egressCourseRepository.save(egressCourse);
+  }
+
+  public void unregisterEgressInCourse(UUID id) {
+    EgressCourse egressCourse = egressCourseRepository.findById(id)
+      .orElseThrow(() -> new ResourceNotFoundException());
+
+    egressCourseRepository.delete(egressCourse);
   }
 
   public Course updateCourse(UUID id, UpdateCourseDTO courseDTO) {
