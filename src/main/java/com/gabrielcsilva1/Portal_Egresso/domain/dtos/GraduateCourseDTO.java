@@ -11,10 +11,10 @@ import lombok.Data;
 
 @Builder
 @Data
-public class EgressCourseDTO {
+public class GraduateCourseDTO {
   @NotNull
   @ValidUUID
-  private UUID egressId;
+  private UUID graduateId;
 
   @NotNull
   @ValidUUID

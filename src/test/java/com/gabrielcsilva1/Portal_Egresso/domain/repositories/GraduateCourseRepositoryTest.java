@@ -14,17 +14,17 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.EgressCourse;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.GraduateCourse;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class EgressCourseRepositoryTest {
+public class GraduateCourseRepositoryTest {
   @Autowired
-  private EgressCourseRepository egressCourseRepository;
+  private GraduateCourseRepository graduateCourseRepository;
 
   @Autowired 
-  private EgressRepository egressRepository;
+  private GraduateRepository graduateRepository;
 
   @Autowired
   private CourseRepository courseRepository;
@@ -34,7 +34,7 @@ public class EgressCourseRepositoryTest {
 
   private Course course;
 
-  private Egress egress;
+  private Graduate graduate;
 
   @BeforeEach
   public void setUp() {
@@ -53,43 +53,43 @@ public class EgressCourseRepositoryTest {
 
     this.course = this.courseRepository.save(course);
 
-    Egress egress = Egress.builder()
+    Graduate graduate = Graduate.builder()
       .name("john doe")
       .email("johndoe@example.com")
       .build();
 
-    this.egress = this.egressRepository.save(egress);
+    this.graduate = this.graduateRepository.save(graduate);
   }
 
   @Test
-  @DisplayName("should be able to register a egress in a course")
-  public void register_egress_in_course() {
-    EgressCourse egressCourse = EgressCourse.builder()
-      .egress(egress)
+  @DisplayName("should be able to register a graduate in a course")
+  public void register_graduate_in_course() {
+    GraduateCourse graduateCourse = GraduateCourse.builder()
+      .graduate(graduate)
       .course(course)
       .startYear(2000)
       .endYear(2020)
       .build();
 
-    EgressCourse result = this.egressCourseRepository.save(egressCourse);
+    GraduateCourse result = this.graduateCourseRepository.save(graduateCourse);
 
     assertNotNull(result);
     assertNotNull(result.getId());
   }
 
   @Test
-  @DisplayName("should be able to get a egress_course by id")
-  public void get_egress_course_by_id(){
-    EgressCourse egressCourse = EgressCourse.builder()
-      .egress(egress)
+  @DisplayName("should be able to get a graduate_course by id")
+  public void get_graduate_course_by_id(){
+    GraduateCourse graduateCourse = GraduateCourse.builder()
+      .graduate(graduate)
       .course(course)
       .startYear(2000)
       .endYear(2020)
       .build();
 
-    EgressCourse savedEgressCourse = this.egressCourseRepository.save(egressCourse);
+    GraduateCourse savedGraduateCourse = this.graduateCourseRepository.save(graduateCourse);
 
-    Optional<EgressCourse> result = this.egressCourseRepository.findById(savedEgressCourse.getId());
+    Optional<GraduateCourse> result = this.graduateCourseRepository.findById(savedGraduateCourse.getId());
 
     assertTrue(result.isPresent());
   }

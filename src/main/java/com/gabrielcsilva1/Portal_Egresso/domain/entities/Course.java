@@ -35,7 +35,7 @@ public class Course {
   private Coordinator coordinator;
 
   @OneToMany(mappedBy = "course")
-  private Set<EgressCourse> egressCourse;
+  private Set<GraduateCourse> graduateCourse;
 
   @Column(nullable = false)
   private String name;

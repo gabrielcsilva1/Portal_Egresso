@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Position;
 
 @DataJpaTest
@@ -23,25 +23,25 @@ public class PositionRepositoryTest {
   private PositionRepository positionRepository;
 
   @Autowired
-  private EgressRepository egressRepository;
+  private GraduateRepository graduateRepository;
 
-  private Egress egress;
+  private Graduate graduate;
 
   @BeforeEach
   public void setUp() {
-    Egress egress = Egress.builder()
+    Graduate graduate = Graduate.builder()
       .name("john doe")
       .email("johndoe@example.com")
       .build();
 
-    this.egress = this.egressRepository.save(egress);
+    this.graduate = this.graduateRepository.save(graduate);
   }
 
   @Test
-  @DisplayName("should be able to register a egress position")
-  public void register_egress_position() {
+  @DisplayName("should be able to register a graduate position")
+  public void register_graduate_position() {
     Position position = Position.builder()
-      .egress(egress)
+      .graduate(graduate)
       .description("Software Engineer")
       .location("XYZ Corp.")
       .startYear(2000)
@@ -51,14 +51,14 @@ public class PositionRepositoryTest {
 
     assertNotNull(result);
     assertNotNull(result.getId());
-    assertEquals(result.getEgress().getId(), egress.getId());
+    assertEquals(result.getGraduate().getId(), graduate.getId());
   }
 
   @Test
-  @DisplayName("should be able to register a egress position")
-  public void get_egress_position_by_id() {
+  @DisplayName("should be able to register a graduate position")
+  public void get_graduate_position_by_id() {
     Position position = Position.builder()
-      .egress(egress)
+      .graduate(graduate)
       .description("Software Engineer")
       .location("XYZ Corp.")
       .startYear(2000)

@@ -3,7 +3,7 @@ package com.gabrielcsilva1.Portal_Egresso.domain.entities;
 import java.util.Set;
 import java.util.UUID;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,21 +19,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "egress")
+@Table(name = "graduate")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Egress {
+public class Graduate {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
-  @OneToMany(mappedBy = "egress")
-  private Set<EgressCourse> egressCourse;
+  @OneToMany(mappedBy = "graduate")
+  private Set<GraduateCourse> graduateCourse;
 
-  @OneToMany(mappedBy = "egress")
+  @OneToMany(mappedBy = "graduate")
   private Set<Position> positions;
   
   @Column(nullable = false)
@@ -56,13 +56,13 @@ public class Egress {
   @Column(name = "curriculum")
   private String curriculum;
 
-  public Egress(EgressDTO egress) {
-    this.name = egress.getName();
-    this.email = egress.getEmail();
-    this.description = egress.getDescription();
-    this.avatarUrl = egress.getAvatarUrl();
-    this.linkedin = egress.getLinkedin();
-    this.instagram = egress.getInstagram();
-    this.curriculum = egress.getCurriculum();
+  public Graduate(GraduateDTO graduate) {
+    this.name = graduate.getName();
+    this.email = graduate.getEmail();
+    this.description = graduate.getDescription();
+    this.avatarUrl = graduate.getAvatarUrl();
+    this.linkedin = graduate.getLinkedin();
+    this.instagram = graduate.getInstagram();
+    this.curriculum = graduate.getCurriculum();
   }
 }

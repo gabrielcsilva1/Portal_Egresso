@@ -18,11 +18,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.PositionDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.position.UpdatePositionDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Position;
-import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
+import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.PositionRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,14 +34,14 @@ public class PositionServiceTest {
   private PositionRepository positionRepository;
 
   @Mock
-  private EgressRepository egressRepository;
+  private GraduateRepository graduateRepository;
   
   @Test
   @DisplayName("should be able to create a new position")
-  public void register_egress_success() {
+  public void register_graduate_success() {
     // DTO
     PositionDTO positionDTO = PositionDTO.builder()
-      .egressId(UUID.randomUUID())
+      .graduateId(UUID.randomUUID())
       .description("Position Description")
       .location("Location Name")
       .startYear(2000)
@@ -49,39 +49,39 @@ public class PositionServiceTest {
       .build();
 
     // Mocks
-    Egress egressMock = Egress.builder()
-      .id(positionDTO.getEgressId())
+    Graduate graduateMock = Graduate.builder()
+      .id(positionDTO.getGraduateId())
       .build();
     
     Position positionMock = Position.builder()
       .id(UUID.randomUUID())
-      .egress(egressMock)
+      .graduate(graduateMock)
       .description(positionDTO.getDescription())
       .location(positionDTO.getLocation())
       .startYear(positionDTO.getStartYear())
       .endYear(positionDTO.getEndYear())
       .build();
 
-    when(this.egressRepository.findById(positionDTO.getEgressId()))
-      .thenReturn(Optional.of(egressMock));
+    when(this.graduateRepository.findById(positionDTO.getGraduateId()))
+      .thenReturn(Optional.of(graduateMock));
 
     when(this.positionRepository.save(any(Position.class)))
       .thenReturn(positionMock);
 
     // Test
-    Position result = this.sut.registerEgressPosition(positionDTO);
+    Position result = this.sut.registerGraduatePosition(positionDTO);
 
     assertEquals(result.getId(), positionMock.getId());
-    assertEquals(result.getEgress().getId(), positionDTO.getEgressId());
+    assertEquals(result.getGraduate().getId(), positionDTO.getGraduateId());
     assertEquals(result.getDescription(), positionDTO.getDescription());
   }
 
   @Test
-  @DisplayName("should not be able to create a new position if the egress does not exist")
-  public void register_egress_position_egress_not_found() {
+  @DisplayName("should not be able to create a new position if the graduate does not exist")
+  public void register_graduate_position_graduate_not_found() {
     // DTO
     PositionDTO positionDTO = PositionDTO.builder()
-      .egressId(UUID.randomUUID())
+      .graduateId(UUID.randomUUID())
       .description("Position Description")
       .location("Location Name")
       .startYear(2000)
@@ -89,21 +89,21 @@ public class PositionServiceTest {
       .build();
 
     // Mocks
-    when(this.egressRepository.findById(positionDTO.getEgressId()))
+    when(this.graduateRepository.findById(positionDTO.getGraduateId()))
       .thenReturn(Optional.empty());
 
     // Test
-    assertThrows(EgressNotFoundException.class, () -> {
-      sut.registerEgressPosition(positionDTO);
+    assertThrows(GraduateNotFoundException.class, () -> {
+      sut.registerGraduatePosition(positionDTO);
     });
   }
 
   @Test
   @DisplayName("should not be able to create a new position with an end year before the start year")
-  public void register_egress_position_invalid_end_year() {
+  public void register_graduate_position_invalid_end_year() {
     // DTO
     PositionDTO positionDTO = PositionDTO.builder()
-      .egressId(UUID.randomUUID())
+      .graduateId(UUID.randomUUID())
       .description("Position Description")
       .location("Location Name")
       .startYear(2020)
@@ -111,20 +111,20 @@ public class PositionServiceTest {
       .build();
 
     // Mocks
-    Egress egressMock = new Egress();
+    Graduate graduateMock = new Graduate();
 
-    when(this.egressRepository.findById(positionDTO.getEgressId()))
-      .thenReturn(Optional.of(egressMock));
+    when(this.graduateRepository.findById(positionDTO.getGraduateId()))
+      .thenReturn(Optional.of(graduateMock));
 
     // Test
     assertThrows(InvalidEndYearException.class, () -> {
-      sut.registerEgressPosition(positionDTO);
+      sut.registerGraduatePosition(positionDTO);
     });
   }
 
   @Test
-  @DisplayName("should be able to update the egress position")
-  public void update_egress_position_success() {
+  @DisplayName("should be able to update the graduate position")
+  public void update_graduate_position_success() {
     UpdatePositionDTO positionDTO = UpdatePositionDTO.builder()
       .description("new description")
       .location("new location")
@@ -141,7 +141,7 @@ public class PositionServiceTest {
     when(positionRepository.save(any(Position.class)))
       .thenAnswer(invocation -> invocation.getArgument(0));
 
-    Position result = sut.updateEgressPosition(positionMock.getId(), positionDTO);
+    Position result = sut.updateGraduatePosition(positionMock.getId(), positionDTO);
 
     assertNotNull(result);
     assertEquals(result.getDescription(), positionDTO.getDescription());

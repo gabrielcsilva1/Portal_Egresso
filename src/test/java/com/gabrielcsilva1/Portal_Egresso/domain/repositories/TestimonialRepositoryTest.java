@@ -15,7 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
 
 @DataJpaTest
@@ -25,22 +25,22 @@ public class TestimonialRepositoryTest {
   private TestimonialRepository testimonialRepository;
 
   @Autowired
-  private EgressRepository egressRepository;
+  private GraduateRepository graduateRepository;
 
-  private Egress egress;
+  private Graduate graduate;
 
   @Test
   @DisplayName("should save a new testimonial")
   void save_new_testimonial() {
-    egress = Egress.builder()
+    graduate = Graduate.builder()
       .name("John Doe")
       .email("john.doe@example.com")
       .build();
     
-    egressRepository.save(egress);
+    graduateRepository.save(graduate);
 
     Testimonial testimonial = testimonialRepository.save(Testimonial.builder()
-            .egress(egress)
+            .graduate(graduate)
             .text("Test testimonial")
             .build());
     
@@ -76,27 +76,27 @@ public class TestimonialRepositoryTest {
   }
 
   void populateTestimonial() {
-    egress = Egress.builder()
+    graduate = Graduate.builder()
       .name("John Doe")
       .email("john.doe@example.com")
       .build();
     
-    egressRepository.save(egress);
+    graduateRepository.save(graduate);
 
     testimonialRepository.save(Testimonial.builder()
-            .egress(egress)
+            .graduate(graduate)
             .text("This is a testimonial from 2023.")
             .createdAt(LocalDateTime.of(2023, 5, 10, 12, 0))
             .build());
     
     testimonialRepository.save(Testimonial.builder()
-            .egress(egress)
+            .graduate(graduate)
             .text("This is a testimonial from 2022.")
             .createdAt(LocalDateTime.of(2022, 5, 10, 12, 0))
             .build());
 
     testimonialRepository.save(Testimonial.builder()
-            .egress(egress)
+            .graduate(graduate)
             .text("This is a recent testimonial.")
             .build());
   }

@@ -31,8 +31,8 @@ public class Testimonial {
   private UUID id;
 
   @ManyToOne
-  @JoinColumn(name = "egress_id", nullable = false)
-  private Egress egress;
+  @JoinColumn(name = "graduate_id", nullable = false)
+  private Graduate graduate;
 
   private String text;
 

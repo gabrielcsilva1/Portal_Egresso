@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressCourseDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.UpdateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.CourseService;
@@ -45,15 +45,15 @@ public class CourseController {
   }
 
   @PostMapping
-  @RequestMapping("/egress")
-  public ResponseEntity<Object> registerEgressInCourse(@Valid @RequestBody EgressCourseDTO egressCourseDTO) {
-    this.courseService.registerEgressInCourse(egressCourseDTO);
+  @RequestMapping("/graduate")
+  public ResponseEntity<Object> registerGraduateInCourse(@Valid @RequestBody GraduateCourseDTO graduateCourseDTO) {
+    this.courseService.registerGraduateInCourse(graduateCourseDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 
-  @DeleteMapping("/egress/{id}")
-  public ResponseEntity<Object> unregisterEgressInCourse(@PathVariable UUID id){
-    this.courseService.unregisterEgressInCourse(id);
+  @DeleteMapping("/graduate/{id}")
+  public ResponseEntity<Object> unregisterGraduateInCourse(@PathVariable UUID id){
+    this.courseService.unregisterGraduateInCourse(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
   }
 

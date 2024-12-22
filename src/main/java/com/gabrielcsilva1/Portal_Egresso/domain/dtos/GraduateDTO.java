@@ -1,15 +1,19 @@
-package com.gabrielcsilva1.Portal_Egresso.domain.dtos.egress;
+package com.gabrielcsilva1.Portal_Egresso.domain.dtos;
 
 import org.hibernate.validator.constraints.URL;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class UpdateEgressDTO {
+public class GraduateDTO {
   @NotBlank
   private String name;
 

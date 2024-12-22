@@ -15,15 +15,15 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.EgressCourse;
-import com.gabrielcsilva1.Portal_Egresso.infra.queryfilters.EgressQueryFilter;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.GraduateCourse;
+import com.gabrielcsilva1.Portal_Egresso.infra.queryfilters.GraduateQueryFilter;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class EgressRepositoryTest {
+public class GraduateRepositoryTest {
   @Autowired
-  private EgressRepository egressRepository;
+  private GraduateRepository graduateRepository;
 
   @Autowired
   private CoordinatorRepository coordinatorRepository;
@@ -32,66 +32,66 @@ public class EgressRepositoryTest {
   private CourseRepository courseRepository;
 
   @Autowired
-  private EgressCourseRepository egressCourseRepository;
+  private GraduateCourseRepository graduateCourseRepository;
 
   @Test
-  @DisplayName("should be able to create a new egress")
-  public void save_new_egress() {
-    Egress egress = Egress.builder()
+  @DisplayName("should be able to create a new graduate")
+  public void save_new_graduate() {
+    Graduate graduate = Graduate.builder()
       .name("john doe")
       .email("johndoe@example.com")
       .build();
 
-    Egress result = this.egressRepository.save(egress);
+    Graduate result = this.graduateRepository.save(graduate);
 
     assertNotNull(result);
     assertNotNull(result.getId());
-    assertEquals(result.getName(), egress.getName());
+    assertEquals(result.getName(), graduate.getName());
   }
 
   @Test
-  @DisplayName("should be able to get a egress by id")
-  public void get_egress_by_id() {
-    Egress egress = Egress.builder()
+  @DisplayName("should be able to get a graduate by id")
+  public void get_graduate_by_id() {
+    Graduate graduate = Graduate.builder()
       .name("john doe")
       .email("johndoe@example.com")
       .build();
 
-    Egress savedEgress = this.egressRepository.save(egress);
+    Graduate savedGraduate = this.graduateRepository.save(graduate);
 
-    Optional<Egress> result = this.egressRepository.findById(savedEgress.getId());
+    Optional<Graduate> result = this.graduateRepository.findById(savedGraduate.getId());
 
     assertTrue(result.isPresent());
   }
 
   @Test
   @DisplayName("should be able to fetch user with filter (query)")
-  public void fetch_egresses_with_query_filter_success() {
-    Egress egress = Egress.builder()
+  public void fetch_graduatees_with_query_filter_success() {
+    Graduate graduate = Graduate.builder()
       .name("john doe")
       .email("johndoe@example.com")
       .build();
 
-    egress = egressRepository.save(egress);
+    graduate = graduateRepository.save(graduate);
 
-    var queryFilter = EgressQueryFilter.builder()
-      .query(egress.getName())
+    var queryFilter = GraduateQueryFilter.builder()
+      .query(graduate.getName())
       .build();
 
-    var result = egressRepository.findAll(queryFilter.toSpecification());
+    var result = graduateRepository.findAll(queryFilter.toSpecification());
 
     assertThat(result).hasSize(1);
   }
 
   @Test
   @DisplayName("should be able to fetch user with filters (query, year and courseName)")
-  public void fetch_egresses_with_filters_success() {
-    Egress egress = Egress.builder()
+  public void fetch_graduatees_with_filters_success() {
+    Graduate graduate = Graduate.builder()
       .name("john doe")
       .email("johndoe@example.com")
       .build();
 
-    egress = egressRepository.save(egress);
+    graduate = graduateRepository.save(graduate);
 
     Coordinator coordinator = Coordinator.builder()
       .login("johndoe")
@@ -108,21 +108,21 @@ public class EgressRepositoryTest {
 
     course = courseRepository.save(course);
 
-    EgressCourse egressCourse = EgressCourse.builder()
+    GraduateCourse graduateCourse = GraduateCourse.builder()
       .course(course)
-      .egress(egress)
+      .graduate(graduate)
       .startYear(2000)
       .build();
 
-    egressCourseRepository.save(egressCourse);
+    graduateCourseRepository.save(graduateCourse);
 
-    var queryFilter = EgressQueryFilter.builder()
+    var queryFilter = GraduateQueryFilter.builder()
       .courseName(course.getName())
-      .query(egress.getName())
-      .year(egressCourse.getStartYear())
+      .query(graduate.getName())
+      .year(graduateCourse.getStartYear())
       .build();
 
-    var result = egressRepository.findAll(queryFilter.toSpecification());
+    var result = graduateRepository.findAll(queryFilter.toSpecification());
 
     assertThat(result).hasSize(1);
   }

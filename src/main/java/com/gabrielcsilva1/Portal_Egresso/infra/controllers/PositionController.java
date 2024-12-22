@@ -21,30 +21,30 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/egress/position")
+@RequestMapping("/graduate/position")
 @Tag(name = "Position", description = "Manages the graduate's positions")
 public class PositionController {
   @Autowired
   private PositionService positionService;
 
   @PostMapping
-  public ResponseEntity<Object> registerEgressPosition(@Valid @RequestBody PositionDTO positionDTO) {
-    this.positionService.registerEgressPosition(positionDTO);
+  public ResponseEntity<Object> registerGraduatePosition(@Valid @RequestBody PositionDTO positionDTO) {
+    this.positionService.registerGraduatePosition(positionDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 
   @PutMapping("/{positionId}")
-  public ResponseEntity<Object> updateEgressPosition(
+  public ResponseEntity<Object> updateGraduatePosition(
     @PathVariable UUID positionId, 
     @Valid @RequestBody UpdatePositionDTO positionDTO
     ) {
-    this.positionService.updateEgressPosition(positionId, positionDTO);
+    this.positionService.updateGraduatePosition(positionId, positionDTO);
     return ResponseEntity.status(HttpStatus.OK).body(null);
   }
 
   @DeleteMapping("/{positionId}")
-  public ResponseEntity<Object> deleteEgressPosition(@PathVariable UUID positionId) {
-    this.positionService.deleteEgressPosition(positionId);
+  public ResponseEntity<Object> deleteGraduatePosition(@PathVariable UUID positionId) {
+    this.positionService.deleteGraduatePosition(positionId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
   }
 }

@@ -29,8 +29,8 @@ public class Position {
   private UUID id;
 
   @ManyToOne
-  @JoinColumn(name = "egress_id", nullable = false)
-  private Egress egress;
+  @JoinColumn(name = "graduate_id", nullable = false)
+  private Graduate graduate;
 
   @Column(nullable = false)
   private String description;

@@ -23,11 +23,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.TestimonialDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
-import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
+import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.TestimonialRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class TestimonialServiceTest {
@@ -35,64 +35,64 @@ public class TestimonialServiceTest {
   private TestimonialService sut;
 
   @Mock
-  private EgressRepository egressRepository;
+  private GraduateRepository graduateRepository;
 
   @Mock
   private TestimonialRepository testimonialRepository;
 
   @Test
-  @DisplayName("should be able to create a egress testimonial.")
-  public void register_egress_testimonial_success() {
+  @DisplayName("should be able to create a graduate testimonial.")
+  public void register_graduate_testimonial_success() {
     // DTO
     var testimonialDTO = TestimonialDTO.builder()
-    .egressId(UUID.randomUUID())
+    .graduateId(UUID.randomUUID())
     .text("testimonial test")
     .build();
 
     // Mocks
-    var mockEgress = Egress.builder()
-      .id(testimonialDTO.getEgressId())
+    var mockGraduate = Graduate.builder()
+      .id(testimonialDTO.getGraduateId())
       .name("John Doe")
       .email("johndoe@example.com")
       .build();
     
     var mockTestimonial = Testimonial.builder()
       .id(UUID.randomUUID())
-      .egress(mockEgress)
+      .graduate(mockGraduate)
       .text(testimonialDTO.getText())
       .createdAt(LocalDateTime.now())
       .build();
 
-    when(this.egressRepository.findById(testimonialDTO.getEgressId()))
-      .thenReturn(Optional.of(mockEgress));
+    when(this.graduateRepository.findById(testimonialDTO.getGraduateId()))
+      .thenReturn(Optional.of(mockGraduate));
     
     when(this.testimonialRepository.save(any(Testimonial.class)))
       .thenReturn(mockTestimonial);
 
     // Test
-    Testimonial result = sut.registerEgressTestimonial(testimonialDTO);
+    Testimonial result = sut.registerGraduateTestimonial(testimonialDTO);
 
     assertEquals(result.getId(), mockTestimonial.getId());
-    assertEquals(result.getEgress().getId(), testimonialDTO.getEgressId());
+    assertEquals(result.getGraduate().getId(), testimonialDTO.getGraduateId());
     assertEquals(result.getCreatedAt(), mockTestimonial.getCreatedAt());
   }
 
   @Test
-  @DisplayName("should not be able to create a testimonial from a egress that does not exist")
-  public void register_egress_testimonial_egress_not_found() {
+  @DisplayName("should not be able to create a testimonial from a graduate that does not exist")
+  public void register_graduate_testimonial_graduate_not_found() {
     // DTO
     var testimonialDTO = TestimonialDTO.builder()
-    .egressId(UUID.randomUUID())
+    .graduateId(UUID.randomUUID())
     .text("testimonial test")
     .build();
 
     // Mocks
-    when(this.egressRepository.findById(testimonialDTO.getEgressId()))
+    when(this.graduateRepository.findById(testimonialDTO.getGraduateId()))
       .thenReturn(Optional.empty());
 
     // Test
-    assertThrows(EgressNotFoundException.class, () -> {
-      sut.registerEgressTestimonial(testimonialDTO);
+    assertThrows(GraduateNotFoundException.class, () -> {
+      sut.registerGraduateTestimonial(testimonialDTO);
     });
   }
 
@@ -102,7 +102,7 @@ public class TestimonialServiceTest {
     // Mocks
     PageRequest pageRequest = PageRequest.of(0, 10);
 
-    Egress egressMock = Egress.builder()
+    Graduate graduateMock = Graduate.builder()
       .id(UUID.randomUUID())
       .name("John Doe")
       .email("john.doe@example.com")
@@ -110,7 +110,7 @@ public class TestimonialServiceTest {
 
     List<Testimonial> testimonialsMock = List.of(
       Testimonial.builder()
-      .egress(egressMock)
+      .graduate(graduateMock)
       .text("testimonial test")
       .build()
     );
@@ -134,7 +134,7 @@ public class TestimonialServiceTest {
     // Mocks
     PageRequest pageRequest = PageRequest.of(0, 10);
 
-    Egress egressMock = Egress.builder()
+    Graduate graduateMock = Graduate.builder()
       .id(UUID.randomUUID())
       .name("John Doe")
       .email("john.doe@example.com")
@@ -142,7 +142,7 @@ public class TestimonialServiceTest {
 
     List<Testimonial> testimonialsMock = List.of(
       Testimonial.builder()
-      .egress(egressMock)
+      .graduate(graduateMock)
       .text("testimonial test 2022")
       .createdAt(LocalDateTime.of(2022, 1, 1, 0, 0, 0))
       .build()
@@ -163,8 +163,8 @@ public class TestimonialServiceTest {
   }
 
   @Test
-  @DisplayName("should be able to update a egress testimonial")
-  public void update_egress_testimonial_success() {
+  @DisplayName("should be able to update a graduate testimonial")
+  public void update_graduate_testimonial_success() {
     String newText = "testimonial text";
 
     Testimonial testimonialMock = Testimonial.builder()
@@ -177,7 +177,7 @@ public class TestimonialServiceTest {
     when(testimonialRepository.save(any(Testimonial.class)))
       .thenAnswer(invocation -> invocation.getArgument(0));
     
-    Testimonial result = sut.updateEgressTestimonial(testimonialMock.getId(), newText);
+    Testimonial result = sut.updateGraduateTestimonial(testimonialMock.getId(), newText);
 
     assertEquals(result.getText(), newText);
   }

@@ -16,12 +16,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "egress_course")
+@Table(name = "graduate_course")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
-public class EgressCourse {
+public class GraduateCourse {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
@@ -31,8 +31,8 @@ public class EgressCourse {
   private Course course;
 
   @ManyToOne
-  @JoinColumn(name = "egress_id", nullable = false)
-  private Egress egress;
+  @JoinColumn(name = "graduate_id", nullable = false)
+  private Graduate graduate;
 
   @Column(name = "start_year", nullable = false)
   private Integer startYear;

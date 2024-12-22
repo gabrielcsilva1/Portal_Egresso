@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CourseNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressAlreadyExistsException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressAlreadyTakenTheCourseException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateAlreadyExistsException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateAlreadyTakenTheCourseException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidCredentialsException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.ResourceNotFoundException;
@@ -58,15 +58,15 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
   }
 
-  @ExceptionHandler(EgressNotFoundException.class)
-  public ResponseEntity<Map<String, String>> handleEgressNotFoundException(EgressNotFoundException exception) {
+  @ExceptionHandler(GraduateNotFoundException.class)
+  public ResponseEntity<Map<String, String>> handleGraduateNotFoundException(GraduateNotFoundException exception) {
     Map<String, String> error = new HashMap<>();
     error.put("error", "Bad request");
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
   }
 
-  @ExceptionHandler(EgressAlreadyExistsException.class)
-  public ResponseEntity<Map<String, String>> handleEgressAlreadyExistsException(EgressAlreadyExistsException exception) {
+  @ExceptionHandler(GraduateAlreadyExistsException.class)
+  public ResponseEntity<Map<String, String>> handleGraduateAlreadyExistsException(GraduateAlreadyExistsException exception) {
     Map<String, String> error = new HashMap<>();
     error.put("error", exception.getMessage());
     return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
@@ -79,8 +79,8 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
   }
 
-  @ExceptionHandler(EgressAlreadyTakenTheCourseException.class)
-  public ResponseEntity<Map<String, String>> handleInvalidEgressAlreadyTakenTheCourseException(EgressAlreadyTakenTheCourseException exception) {
+  @ExceptionHandler(GraduateAlreadyTakenTheCourseException.class)
+  public ResponseEntity<Map<String, String>> handleInvalidGraduateAlreadyTakenTheCourseException(GraduateAlreadyTakenTheCourseException exception) {
     Map<String, String> error = new HashMap<>();
     error.put("error", exception.getMessage());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);

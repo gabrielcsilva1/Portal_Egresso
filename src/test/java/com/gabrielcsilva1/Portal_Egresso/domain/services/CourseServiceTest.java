@@ -16,20 +16,20 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressCourseDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.UpdateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.EgressCourse;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.GraduateCourse;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CourseRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressCourseRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
+import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateCourseRepository;
+import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CourseNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressAlreadyTakenTheCourseException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateAlreadyTakenTheCourseException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,10 +44,10 @@ public class CourseServiceTest {
   private CoordinatorRepository coordinatorRepository;
 
   @Mock
-  private EgressRepository egressRepository;
+  private GraduateRepository graduateRepository;
 
   @Mock
-  private EgressCourseRepository egressCourseRepository;
+  private GraduateCourseRepository graduateCourseRepository;
 
   @Test
   @DisplayName("should be able to create a new course")
@@ -104,11 +104,11 @@ public class CourseServiceTest {
   }
 
   @Test
-  @DisplayName("should be able to register a egress in a course")
-  public void register_egress_in_course_success() {
+  @DisplayName("should be able to register a graduate in a course")
+  public void register_graduate_in_course_success() {
     // DTO
-    var egressCourseDTO = EgressCourseDTO.builder()
-      .egressId(UUID.randomUUID())
+    var graduateCourseDTO = GraduateCourseDTO.builder()
+      .graduateId(UUID.randomUUID())
       .courseId(UUID.randomUUID())
       .startYear(Integer.valueOf(2000))
       .endYear(Integer.valueOf(2020))
@@ -116,92 +116,92 @@ public class CourseServiceTest {
 
     // Mocks
     Course courseMock = Course.builder()
-      .id(egressCourseDTO.getCourseId())
+      .id(graduateCourseDTO.getCourseId())
       .build();
 
-    Egress egressMock = Egress.builder()
-      .id(egressCourseDTO.getEgressId())
+    Graduate graduateMock = Graduate.builder()
+      .id(graduateCourseDTO.getGraduateId())
       .build();
 
-    EgressCourse egressCourseMock = EgressCourse.builder()
+    GraduateCourse graduateCourseMock = GraduateCourse.builder()
       .id(UUID.randomUUID())
-      .egress(egressMock)
+      .graduate(graduateMock)
       .course(courseMock)
-      .startYear(egressCourseDTO.getStartYear())
-      .endYear(egressCourseDTO.getEndYear())
+      .startYear(graduateCourseDTO.getStartYear())
+      .endYear(graduateCourseDTO.getEndYear())
       .build();
 
     // Mock behavior
-    when(courseRepository.findById(egressCourseDTO.getCourseId()))
+    when(courseRepository.findById(graduateCourseDTO.getCourseId()))
       .thenReturn(Optional.of(courseMock));
-    when(egressRepository.findById(egressCourseDTO.getEgressId()))
-      .thenReturn(Optional.of(egressMock));
-    when(egressCourseRepository.save(any(EgressCourse.class)))
-      .thenReturn(egressCourseMock);
+    when(graduateRepository.findById(graduateCourseDTO.getGraduateId()))
+      .thenReturn(Optional.of(graduateMock));
+    when(graduateCourseRepository.save(any(GraduateCourse.class)))
+      .thenReturn(graduateCourseMock);
 
     // Test
-    EgressCourse result = sut.registerEgressInCourse(egressCourseDTO);
+    GraduateCourse result = sut.registerGraduateInCourse(graduateCourseDTO);
 
-    assertEquals(result.getId(), egressCourseMock.getId());
-    assertEquals(result.getCourse().getId(), egressCourseDTO.getCourseId());
-    assertEquals(result.getEgress().getId(), egressCourseDTO.getEgressId());
+    assertEquals(result.getId(), graduateCourseMock.getId());
+    assertEquals(result.getCourse().getId(), graduateCourseDTO.getCourseId());
+    assertEquals(result.getGraduate().getId(), graduateCourseDTO.getGraduateId());
   }
 
   @Test
-  @DisplayName("should not be able to register a invalid egress in a course")
-  public void register_egress_in_course_egress_not_found() {
+  @DisplayName("should not be able to register a invalid graduate in a course")
+  public void register_graduate_in_course_graduate_not_found() {
     // DTO
-    var egressCourseDTO = EgressCourseDTO.builder()
-      .egressId(UUID.randomUUID())
+    var graduateCourseDTO = GraduateCourseDTO.builder()
+      .graduateId(UUID.randomUUID())
       .courseId(UUID.randomUUID())
       .startYear(Integer.valueOf(2000))
       .endYear(Integer.valueOf(2020))
       .build();
 
     // Mock behavior
-    when(egressRepository.findById(egressCourseDTO.getEgressId()))
+    when(graduateRepository.findById(graduateCourseDTO.getGraduateId()))
       .thenReturn(Optional.empty());
 
     // Test
-    assertThrows(EgressNotFoundException.class, () -> {
-      sut.registerEgressInCourse(egressCourseDTO) ;
+    assertThrows(GraduateNotFoundException.class, () -> {
+      sut.registerGraduateInCourse(graduateCourseDTO) ;
     });
   }
 
   @Test
-  @DisplayName("should not be able to register a egress in a invalid course")
-  public void register_egress_in_course_course_not_found() {
+  @DisplayName("should not be able to register a graduate in a invalid course")
+  public void register_graduate_in_course_course_not_found() {
     // DTO
-    var egressCourseDTO = EgressCourseDTO.builder()
-      .egressId(UUID.randomUUID())
+    var graduateCourseDTO = GraduateCourseDTO.builder()
+      .graduateId(UUID.randomUUID())
       .courseId(UUID.randomUUID())
       .startYear(Integer.valueOf(2000))
       .endYear(Integer.valueOf(2020))
       .build();
 
     // Mocks
-    Egress egressMock = Egress.builder()
-      .id(egressCourseDTO.getEgressId())
+    Graduate graduateMock = Graduate.builder()
+      .id(graduateCourseDTO.getGraduateId())
       .build();
 
     // Mock behavior
-    when(egressRepository.findById(egressCourseDTO.getEgressId()))
-      .thenReturn(Optional.of(egressMock));
-    when(courseRepository.findById(egressCourseDTO.getCourseId()))
+    when(graduateRepository.findById(graduateCourseDTO.getGraduateId()))
+      .thenReturn(Optional.of(graduateMock));
+    when(courseRepository.findById(graduateCourseDTO.getCourseId()))
       .thenReturn(Optional.empty());
 
     // Test
     assertThrows(CourseNotFoundException.class, () -> {
-      sut.registerEgressInCourse(egressCourseDTO);
+      sut.registerGraduateInCourse(graduateCourseDTO);
     });
   }
 
   @Test
-  @DisplayName("should not be able to register an egress in the course with an end year before the start year")
-  public void register_egress_in_course_invalid_end_year() {
+  @DisplayName("should not be able to register an graduate in the course with an end year before the start year")
+  public void register_graduate_in_course_invalid_end_year() {
     // DTO
-    var egressCourseDTO = EgressCourseDTO.builder()
-      .egressId(UUID.randomUUID())
+    var graduateCourseDTO = GraduateCourseDTO.builder()
+      .graduateId(UUID.randomUUID())
       .courseId(UUID.randomUUID())
       .startYear(Integer.valueOf(2000))
       .endYear(Integer.valueOf(1990))
@@ -209,31 +209,31 @@ public class CourseServiceTest {
 
     // Mocks
     Course courseMock = Course.builder()
-      .id(egressCourseDTO.getCourseId())
+      .id(graduateCourseDTO.getCourseId())
       .build();
 
-    Egress egressMock = Egress.builder()
-      .id(egressCourseDTO.getEgressId())
+    Graduate graduateMock = Graduate.builder()
+      .id(graduateCourseDTO.getGraduateId())
       .build();
 
     // Mock behavior
-    when(courseRepository.findById(egressCourseDTO.getCourseId()))
+    when(courseRepository.findById(graduateCourseDTO.getCourseId()))
       .thenReturn(Optional.of(courseMock));
-    when(egressRepository.findById(egressCourseDTO.getEgressId()))
-      .thenReturn(Optional.of(egressMock));
+    when(graduateRepository.findById(graduateCourseDTO.getGraduateId()))
+      .thenReturn(Optional.of(graduateMock));
 
     // Test
     assertThrows(InvalidEndYearException.class, () -> {
-      sut.registerEgressInCourse(egressCourseDTO);
+      sut.registerGraduateInCourse(graduateCourseDTO);
     });
   }
 
   @Test
-  @DisplayName("should not be able to register an egress twice in the same course")
-  public void register_egress_in_course_egress_already_taken_the_course() {
+  @DisplayName("should not be able to register an graduate twice in the same course")
+  public void register_graduate_in_course_graduate_already_taken_the_course() {
     // DTO
-    var egressCourseDTO = EgressCourseDTO.builder()
-      .egressId(UUID.randomUUID())
+    var graduateCourseDTO = GraduateCourseDTO.builder()
+      .graduateId(UUID.randomUUID())
       .courseId(UUID.randomUUID())
       .startYear(Integer.valueOf(2000))
       .endYear(Integer.valueOf(2020))
@@ -241,26 +241,26 @@ public class CourseServiceTest {
 
     // Mocks
     Course courseMock = Course.builder()
-      .id(egressCourseDTO.getCourseId())
+      .id(graduateCourseDTO.getCourseId())
       .build();
 
-    Egress egressMock = Egress.builder()
-      .id(egressCourseDTO.getEgressId())
+    Graduate graduateMock = Graduate.builder()
+      .id(graduateCourseDTO.getGraduateId())
       .build();
 
-    EgressCourse egressCourseMock = new EgressCourse();
+    GraduateCourse graduateCourseMock = new GraduateCourse();
 
     // Mock behavior
-    when(courseRepository.findById(egressCourseDTO.getCourseId()))
+    when(courseRepository.findById(graduateCourseDTO.getCourseId()))
       .thenReturn(Optional.of(courseMock));
-    when(egressRepository.findById(egressCourseDTO.getEgressId()))
-      .thenReturn(Optional.of(egressMock));
-    when(egressCourseRepository.findByEgressAndCourse(egressMock, courseMock))
-      .thenReturn(Optional.of(egressCourseMock));
+    when(graduateRepository.findById(graduateCourseDTO.getGraduateId()))
+      .thenReturn(Optional.of(graduateMock));
+    when(graduateCourseRepository.findByGraduateAndCourse(graduateMock, courseMock))
+      .thenReturn(Optional.of(graduateCourseMock));
 
     // Test
-    assertThrows(EgressAlreadyTakenTheCourseException.class, () -> {
-      sut.registerEgressInCourse(egressCourseDTO);
+    assertThrows(GraduateAlreadyTakenTheCourseException.class, () -> {
+      sut.registerGraduateInCourse(graduateCourseDTO);
     });
   }
 

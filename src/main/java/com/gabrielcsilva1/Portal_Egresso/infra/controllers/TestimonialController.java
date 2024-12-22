@@ -22,20 +22,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/egress/testimonial")
+@RequestMapping("/graduate/testimonial")
 @Tag(name = "Testimonial", description = "Manages the graduate's testimonials")
 public class TestimonialController {
   @Autowired
   private TestimonialService testimonialService;
 
   @PostMapping
-  public ResponseEntity<Object> registerEgressTestimonial(@Valid @RequestBody TestimonialDTO testimonialDTO) {
-    this.testimonialService.registerEgressTestimonial(testimonialDTO);
+  public ResponseEntity<Object> registerGraduateTestimonial(@Valid @RequestBody TestimonialDTO testimonialDTO) {
+    this.testimonialService.registerGraduateTestimonial(testimonialDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 
   @GetMapping
-  public ResponseEntity<Object> fetchEgressTestimonials(
+  public ResponseEntity<Object> fetchGraduateTestimonials(
     @RequestParam Integer year, 
     @RequestParam(defaultValue = "1") int page, 
     @RequestParam(defaultValue = "20") int size
@@ -44,17 +44,17 @@ public class TestimonialController {
   }
 
   @PutMapping("/{testimonialId}")
-  public ResponseEntity<Object> updateEgressTestimonial(
+  public ResponseEntity<Object> updateGraduateTestimonial(
     @PathVariable UUID testimonialId, 
     @Valid @RequestBody String text
     ) {
-      this.testimonialService.updateEgressTestimonial(testimonialId, text);
+      this.testimonialService.updateGraduateTestimonial(testimonialId, text);
       return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
   @DeleteMapping("{testimonialId}")
-  public ResponseEntity<Object> deleteEgressTestimonial(@PathVariable UUID testimonialId) {
-    this.testimonialService.deleteEgressTestimonial(testimonialId);
+  public ResponseEntity<Object> deleteGraduateTestimonial(@PathVariable UUID testimonialId) {
+    this.testimonialService.deleteGraduateTestimonial(testimonialId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
   }
 }

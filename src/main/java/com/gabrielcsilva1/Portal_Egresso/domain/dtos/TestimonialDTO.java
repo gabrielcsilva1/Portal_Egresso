@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class TestimonialDTO {
   @NotNull
   @ValidUUID
-  private UUID egressId;
+  private UUID graduateId;
 
   @NotBlank
   private String text;

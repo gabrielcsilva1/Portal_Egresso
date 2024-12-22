@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.PositionDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.position.UpdatePositionDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Position;
-import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
+import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.PositionRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.ResourceNotFoundException;
 
@@ -20,13 +20,13 @@ public class PositionService {
   private PositionRepository positionRepository;
 
   @Autowired
-  private EgressRepository egressRepository;
+  private GraduateRepository graduateRepository;
   
-  public Position registerEgressPosition(PositionDTO positionDTO) {
-    var egress = this.egressRepository.findById(positionDTO.getEgressId());
+  public Position registerGraduatePosition(PositionDTO positionDTO) {
+    var graduate = this.graduateRepository.findById(positionDTO.getGraduateId());
 
-    if (egress.isEmpty()) {
-      throw new EgressNotFoundException();
+    if (graduate.isEmpty()) {
+      throw new GraduateNotFoundException();
     }
 
     boolean isStartYearGreaterThanEndYear = false;
@@ -40,7 +40,7 @@ public class PositionService {
     }
 
     var position = Position.builder()
-      .egress(egress.get())
+      .graduate(graduate.get())
       .description(positionDTO.getDescription())
       .location(positionDTO.getLocation())
       .startYear(positionDTO.getStartYear())
@@ -50,8 +50,8 @@ public class PositionService {
     return this.positionRepository.save(position);
   }
 
-  public Position updateEgressPosition(UUID id, UpdatePositionDTO positionDTO) {
-    Position position = this.positionRepository.findById(id)
+  public Position updateGraduatePosition(UUID positionId, UpdatePositionDTO positionDTO) {
+    Position position = this.positionRepository.findById(positionId)
       .orElseThrow(() -> new ResourceNotFoundException());
 
     position.setDescription(positionDTO.getDescription());
@@ -62,8 +62,8 @@ public class PositionService {
     return this.positionRepository.save(position);
   }
 
-  public void deleteEgressPosition(UUID id) {
-    Position position = this.positionRepository.findById(id)
+  public void deleteGraduatePosition(UUID positionId) {
+    Position position = this.positionRepository.findById(positionId)
       .orElseThrow(() -> new ResourceNotFoundException());
 
     this.positionRepository.delete(position);

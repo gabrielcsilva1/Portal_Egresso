@@ -7,19 +7,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressCourseDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.UpdateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.EgressCourse;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.GraduateCourse;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CourseRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressCourseRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
+import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateCourseRepository;
+import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.ResourceNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CourseNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressAlreadyTakenTheCourseException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateAlreadyTakenTheCourseException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
 
 @Service
@@ -31,10 +31,10 @@ public class CourseService {
   private CoordinatorRepository coordinatorRepository;
 
   @Autowired
-  private EgressRepository egressRepository;
+  private GraduateRepository graduateRepository;
 
   @Autowired
-  private EgressCourseRepository egressCourseRepository;
+  private GraduateCourseRepository graduateCourseRepository;
 
   public Course createCourse(CourseDTO courseDTO) {
     var coordinator = this.coordinatorRepository.findById(courseDTO.getCoordinatorId());
@@ -56,52 +56,52 @@ public class CourseService {
     return this.courseRepository.findAllByOrderByNameAsc();
   }
 
-  public EgressCourse registerEgressInCourse(EgressCourseDTO egressCourseDTO) {
-    var egress = this.egressRepository.findById(egressCourseDTO.getEgressId());
+  public GraduateCourse registerGraduateInCourse(GraduateCourseDTO graduateCourseDTO) {
+    var graduate = this.graduateRepository.findById(graduateCourseDTO.getGraduateId());
 
-    if (egress.isEmpty()) {
-      throw new EgressNotFoundException();
+    if (graduate.isEmpty()) {
+      throw new GraduateNotFoundException();
     }
 
-    var course = this.courseRepository.findById(egressCourseDTO.getCourseId());
+    var course = this.courseRepository.findById(graduateCourseDTO.getCourseId());
 
     if (course.isEmpty()) {
       throw new CourseNotFoundException();
     }
 
-    boolean egressAlreadyTakenTheCourse = this.egressCourseRepository
-      .findByEgressAndCourse(egress.get(), course.get())
+    boolean graduateAlreadyTakenTheCourse = this.graduateCourseRepository
+      .findByGraduateAndCourse(graduate.get(), course.get())
       .isPresent();
 
-    if (egressAlreadyTakenTheCourse) {
-      throw new EgressAlreadyTakenTheCourseException(course.get().getName());
+    if (graduateAlreadyTakenTheCourse) {
+      throw new GraduateAlreadyTakenTheCourseException(course.get().getName());
     }
     
     boolean isStartYearGreaterThanEndYear = false;
 
-    if (egressCourseDTO.getEndYear() != null) {
-      isStartYearGreaterThanEndYear = egressCourseDTO.getStartYear().intValue() > egressCourseDTO.getEndYear().intValue();
+    if (graduateCourseDTO.getEndYear() != null) {
+      isStartYearGreaterThanEndYear = graduateCourseDTO.getStartYear().intValue() > graduateCourseDTO.getEndYear().intValue();
     }
 
     if (isStartYearGreaterThanEndYear) {
       throw new InvalidEndYearException();
     }
 
-    var egressCourse = EgressCourse.builder()
+    var graduateCourse = GraduateCourse.builder()
       .course(course.get())
-      .egress(egress.get())
-      .startYear(egressCourseDTO.getStartYear())
-      .endYear(egressCourseDTO.getEndYear())
+      .graduate(graduate.get())
+      .startYear(graduateCourseDTO.getStartYear())
+      .endYear(graduateCourseDTO.getEndYear())
       .build();
 
-    return this.egressCourseRepository.save(egressCourse);
+    return this.graduateCourseRepository.save(graduateCourse);
   }
 
-  public void unregisterEgressInCourse(UUID id) {
-    EgressCourse egressCourse = egressCourseRepository.findById(id)
+  public void unregisterGraduateInCourse(UUID id) {
+    GraduateCourse graduateCourse = graduateCourseRepository.findById(id)
       .orElseThrow(() -> new ResourceNotFoundException());
 
-    egressCourseRepository.delete(egressCourse);
+    graduateCourseRepository.delete(graduateCourse);
   }
 
   public Course updateCourse(UUID id, UpdateCourseDTO courseDTO) {

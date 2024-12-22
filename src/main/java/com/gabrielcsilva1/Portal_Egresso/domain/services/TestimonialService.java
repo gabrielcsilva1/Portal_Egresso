@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.TestimonialDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
-import com.gabrielcsilva1.Portal_Egresso.domain.repositories.EgressRepository;
+import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.TestimonialRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.EgressNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.ResourceNotFoundException;
 
 @Service
@@ -21,17 +21,17 @@ public class TestimonialService {
   private TestimonialRepository testimonialRepository;
 
   @Autowired
-  private EgressRepository egressRepository;
+  private GraduateRepository graduateRepository;
 
-  public Testimonial registerEgressTestimonial(TestimonialDTO testimonialDTO) {
-    var egress = this.egressRepository.findById(testimonialDTO.getEgressId());
+  public Testimonial registerGraduateTestimonial(TestimonialDTO testimonialDTO) {
+    var graduate = this.graduateRepository.findById(testimonialDTO.getGraduateId());
 
-    if (egress.isEmpty()) {
-      throw new EgressNotFoundException();
+    if (graduate.isEmpty()) {
+      throw new GraduateNotFoundException();
     }
 
     var testimonial = Testimonial.builder()
-    .egress(egress.get())
+    .graduate(graduate.get())
     .text(testimonialDTO.getText())
     .build();
 
@@ -57,16 +57,16 @@ public class TestimonialService {
     return testimonials;
   }
 
-  public Testimonial updateEgressTestimonial(UUID id, String text) {
-    Testimonial testimonial = this.testimonialRepository.findById(id)
+  public Testimonial updateGraduateTestimonial(UUID testimonialId, String text) {
+    Testimonial testimonial = this.testimonialRepository.findById(testimonialId)
       .orElseThrow(() -> new ResourceNotFoundException());
     
     testimonial.setText(text);
     return this.testimonialRepository.save(testimonial);
   }
 
-  public void deleteEgressTestimonial(UUID id) {
-    Testimonial testimonial = this.testimonialRepository.findById(id)
+  public void deleteGraduateTestimonial(UUID testimonialId) {
+    Testimonial testimonial = this.testimonialRepository.findById(testimonialId)
       .orElseThrow(() -> new ResourceNotFoundException());
     
     this.testimonialRepository.delete(testimonial);

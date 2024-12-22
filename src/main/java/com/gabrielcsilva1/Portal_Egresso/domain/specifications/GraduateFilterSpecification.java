@@ -3,24 +3,24 @@ package com.gabrielcsilva1.Portal_Egresso.domain.specifications;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.ObjectUtils;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 
 import jakarta.persistence.criteria.JoinType;
 
-public class EgressFilterSpecification {
-  public static Specification<Egress> didEgressTakenCourseInTheYear(Integer year) {
+public class GraduateFilterSpecification {
+  public static Specification<Graduate> didGraduateTakenCourseInTheYear(Integer year) {
     return (root, _, builder) -> {
       if (ObjectUtils.isEmpty(year)) {
         return null;
       }
 
-      var egressCourseJoin = root.join("egressCourse");
+      var graduateCourseJoin = root.join("graduateCourse");
 
-      var isStartYearGreaterOrEqualThanYear = builder.le(egressCourseJoin.get("startYear"), year);
+      var isStartYearGreaterOrEqualThanYear = builder.le(graduateCourseJoin.get("startYear"), year);
 
       var isEndYearLessThanOrEqualThanYear = builder.or(
-        builder.isNull(egressCourseJoin.get("endYear")),
-        builder.ge(egressCourseJoin.get("endYear"), year)
+        builder.isNull(graduateCourseJoin.get("endYear")),
+        builder.ge(graduateCourseJoin.get("endYear"), year)
       );
 
       return builder.and(
@@ -30,7 +30,7 @@ public class EgressFilterSpecification {
     };
   }
 
-  public static Specification<Egress> isNameEqualTo(String name) {
+  public static Specification<Graduate> isNameEqualTo(String name) {
     return (root, _, builder) -> {
       if (ObjectUtils.isEmpty(name)) {
         return null;
@@ -42,13 +42,13 @@ public class EgressFilterSpecification {
     };
   }
 
-  public static Specification<Egress> didEgressTakenTheCourseByName(String courseName) {
+  public static Specification<Graduate> didGraduateTakenTheCourseByName(String courseName) {
     return (root, _, builder) -> {
       if (ObjectUtils.isEmpty(courseName)) {
         return null;
       }
 
-      var courseJoin = root.join("egressCourse").join("course");
+      var courseJoin = root.join("graduateCourse").join("course");
 
       var courseNameInLowerCase = builder.lower(courseJoin.get("name"));
 
@@ -56,13 +56,13 @@ public class EgressFilterSpecification {
     };
   }
 
-  public static Specification<Egress> didEgressHoldPositionNamed(String positionName) {
+  public static Specification<Graduate> didGraduateHoldPositionNamed(String positionName) {
     return (root, _, builder) -> {
       if (ObjectUtils.isEmpty(positionName)) {
         return null;
       }
 
-      var positionJoin = root.join("positions", JoinType.LEFT);
+      var positionJoin = root.join("positions", JoinType.LEFT); 
       var positionDescriptionInLowerCase = builder.lower(positionJoin.get("description"));
 
       return builder.like(positionDescriptionInLowerCase, "%" + positionName.toLowerCase() + "%");
