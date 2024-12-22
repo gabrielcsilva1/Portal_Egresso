@@ -1,5 +1,6 @@
 package com.gabrielcsilva1.Portal_Egresso.infra.controllers;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +20,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.EgressDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.egress.FetchEgressResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.egress.UpdateEgressDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Egress;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.EgressService;
 import com.gabrielcsilva1.Portal_Egresso.infra.presenters.EgressPresenter;
 import com.gabrielcsilva1.Portal_Egresso.infra.queryfilters.EgressQueryFilter;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/egress")
+@Tag(name = "Graduate")
 public class EgressController { 
   @Autowired
   EgressService egressService;
@@ -40,15 +44,19 @@ public class EgressController {
     ) {
     Page<Egress> filteredEgresses = this.egressService.fetchEgresses(filters.toSpecification(), page);
 
-    var egressPresenter = filteredEgresses.getContent().stream()
-    .map(EgressPresenter::toEgressFilterResponse)
+    List<FetchEgressResponse> egressPresenterList = filteredEgresses.getContent().stream()
+    .map(EgressPresenter::toFetchEgressResponse)
     .toList();
 
 
-    var response = new PageImpl<>(egressPresenter, filteredEgresses.getPageable(), filteredEgresses.getTotalElements());
+    var paginatedEgressPresenterList = new PageImpl<>(
+      egressPresenterList, 
+      filteredEgresses.getPageable(), 
+      filteredEgresses.getTotalElements()
+      );
 
     return ResponseEntity.ok(
-      response
+      paginatedEgressPresenterList
     );
   }
 

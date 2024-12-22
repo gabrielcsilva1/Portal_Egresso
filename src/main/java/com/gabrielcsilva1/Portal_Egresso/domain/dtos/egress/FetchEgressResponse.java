@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EgressFilterResponse {
+public class FetchEgressResponse {
   private UUID id;
   private List<String> courses;
   private String name;

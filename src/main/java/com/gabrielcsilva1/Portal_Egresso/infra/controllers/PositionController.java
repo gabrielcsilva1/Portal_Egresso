@@ -17,21 +17,23 @@ import com.gabrielcsilva1.Portal_Egresso.domain.dtos.PositionDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.position.UpdatePositionDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.PositionService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
+@RequestMapping("/egress/position")
+@Tag(name = "Position", description = "Manages the graduate's positions")
 public class PositionController {
   @Autowired
   private PositionService positionService;
 
   @PostMapping
-  @RequestMapping("/egress/position")
   public ResponseEntity<Object> registerEgressPosition(@Valid @RequestBody PositionDTO positionDTO) {
     this.positionService.registerEgressPosition(positionDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 
-  @PutMapping("/egress/position/{positionId}")
+  @PutMapping("/{positionId}")
   public ResponseEntity<Object> updateEgressPosition(
     @PathVariable UUID positionId, 
     @Valid @RequestBody UpdatePositionDTO positionDTO
@@ -40,7 +42,7 @@ public class PositionController {
     return ResponseEntity.status(HttpStatus.OK).body(null);
   }
 
-  @DeleteMapping("/egress/position/{positionId}")
+  @DeleteMapping("/{positionId}")
   public ResponseEntity<Object> deleteEgressPosition(@PathVariable UUID positionId) {
     this.positionService.deleteEgressPosition(positionId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);

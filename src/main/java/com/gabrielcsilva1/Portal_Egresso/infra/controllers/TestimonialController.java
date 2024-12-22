@@ -18,21 +18,23 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.TestimonialDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TestimonialService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
+@RequestMapping("/egress/testimonial")
+@Tag(name = "Testimonial", description = "Manages the graduate's testimonials")
 public class TestimonialController {
   @Autowired
   private TestimonialService testimonialService;
 
   @PostMapping
-  @RequestMapping("/egress/testimonial")
   public ResponseEntity<Object> registerEgressTestimonial(@Valid @RequestBody TestimonialDTO testimonialDTO) {
     this.testimonialService.registerEgressTestimonial(testimonialDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 
-  @GetMapping("/egress/testimonial")
+  @GetMapping
   public ResponseEntity<Object> fetchEgressTestimonials(
     @RequestParam Integer year, 
     @RequestParam(defaultValue = "1") int page, 
@@ -41,7 +43,7 @@ public class TestimonialController {
     return ResponseEntity.ok(this.testimonialService.fetchTestimonials(year, page, size));
   }
 
-  @PutMapping("/egress/testimonial/{testimonialId}")
+  @PutMapping("/{testimonialId}")
   public ResponseEntity<Object> updateEgressTestimonial(
     @PathVariable UUID testimonialId, 
     @Valid @RequestBody String text
@@ -50,7 +52,7 @@ public class TestimonialController {
       return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-  @DeleteMapping("/egress/testimonial/{testimonialId}")
+  @DeleteMapping("{testimonialId}")
   public ResponseEntity<Object> deleteEgressTestimonial(@PathVariable UUID testimonialId) {
     this.testimonialService.deleteEgressTestimonial(testimonialId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
