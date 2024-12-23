@@ -42,6 +42,10 @@ public class GraduateService {
   }
 
   public Page<Graduate> fetchGraduates(Specification<Graduate> queryFilters, Integer page) {
+    if (page < 0) {
+      page = 0;
+    }
+    
     Pageable pageable = PageRequest.of(page, 20);
 
     return this.graduateRepository.findAll(queryFilters, pageable);

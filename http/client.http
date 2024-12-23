@@ -1,0 +1,74 @@
+@url = http://localhost:8080
+@coordinatorId = 
+
+POST {{url}}/course
+Content-Type: application/json
+
+{
+  "coordinatorId": "{{coordinatorId}}",
+  "name": "Ciencias da Computação",
+  "level": "Graduação"
+}
+
+###
+
+POST {{url}}/graduate
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "johndoe@example.com"
+}
+
+###
+
+POST {{url}}/course/graduate
+Content-Type: application/json
+
+{
+  "graduateId": "",
+  "courseId": "",
+  "startYear": 2015,
+  "endYear": 2020
+}
+###
+
+POST {{url}}/course/graduate
+Content-Type: application/json
+
+{
+  "graduateId": "",
+  "courseId": "",
+  "startYear": 2019
+}
+
+###
+POST {{url}}/graduate/testimonial
+Content-Type: application/json
+
+{
+  "graduateId": "",
+  "text": "depoimento teste"
+}
+
+###
+POST {{url}}/graduate/position
+Content-Type: application/json
+
+{
+  "graduateId": "",
+  "description": "Desenvolvedor",
+  "location": "UFMA",
+  "startYear": 2005,
+  "endYear": 2009
+}
+
+###
+
+GET {{url}}/graduate
+
+###
+GET {{url}}/course
+
+###
+GET {{url}}/graduate/testimonial

@@ -1,8 +1,10 @@
 package com.gabrielcsilva1.Portal_Egresso.infra.controllers;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,7 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.TestimonialDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.paginated.PaginatedResponse;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.testimonial.GetTestimonialResponse;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TestimonialService;
+import com.gabrielcsilva1.Portal_Egresso.infra.presenters.TestimonialPresenter;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -36,11 +42,25 @@ public class TestimonialController {
 
   @GetMapping
   public ResponseEntity<Object> fetchGraduateTestimonials(
-    @RequestParam Integer year, 
+    @RequestParam(required = false) Integer year, 
     @RequestParam(defaultValue = "1") int page, 
     @RequestParam(defaultValue = "20") int size
     ) {
-    return ResponseEntity.ok(this.testimonialService.fetchTestimonials(year, page, size));
+    Page<Testimonial> testimonialsPaginated = this.testimonialService.fetchTestimonials(year, page-1, size);
+
+    List<GetTestimonialResponse> testimonialPresenter = testimonialsPaginated.getContent()
+      .stream()
+      .map(TestimonialPresenter::toGetTestimonialResponse)
+      .toList();
+
+    PaginatedResponse<GetTestimonialResponse> testimonialPresenterPaginated = new PaginatedResponse<>(
+      testimonialPresenter,
+      testimonialsPaginated.getNumber(),
+      testimonialsPaginated.getTotalPages(),
+      testimonialsPaginated.getTotalElements()
+    );
+
+    return ResponseEntity.ok(testimonialPresenterPaginated);
   }
 
   @PutMapping("/{testimonialId}")

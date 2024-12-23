@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.FetchGraduateResponse;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.GetGraduateResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.UpdateGraduateDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.paginated.PaginatedResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.GraduateService;
 import com.gabrielcsilva1.Portal_Egresso.infra.presenters.GraduatePresenter;
@@ -40,18 +41,19 @@ public class GraduateController {
   @GetMapping
   public ResponseEntity<Object> fetchGraduates(
     @ModelAttribute GraduateQueryFilter filters,
-    @RequestParam(defaultValue = "0") Integer page
+    @RequestParam(defaultValue = "1") Integer page
     ) {
-    Page<Graduate> filteredGraduates = this.graduateService.fetchGraduates(filters.toSpecification(), page);
+    Page<Graduate> filteredGraduates = this.graduateService.fetchGraduates(filters.toSpecification(), page-1);
 
     List<FetchGraduateResponse> graduatePresenterList = filteredGraduates.getContent().stream()
     .map(GraduatePresenter::toFetchGraduateResponse)
     .toList();
 
 
-    var paginatedGraduatePresenterList = new PageImpl<>(
+    var paginatedGraduatePresenterList = new PaginatedResponse<>(
       graduatePresenterList, 
-      filteredGraduates.getPageable(), 
+      filteredGraduates.getNumber(), 
+      filteredGraduates.getTotalPages(),
       filteredGraduates.getTotalElements()
       );
 
@@ -71,7 +73,9 @@ public class GraduateController {
   public ResponseEntity<Object> getGraduateById(@PathVariable UUID id) {
     Graduate graduate = this.graduateService.getGraduateById(id);
 
-    return ResponseEntity.status(HttpStatus.OK).body(graduate);
+    GetGraduateResponse graduatePresenter = GraduatePresenter.toGetGraduateResponse(graduate);
+
+    return ResponseEntity.status(HttpStatus.OK).body(graduatePresenter);
   }
 
   @PutMapping("/{id}")

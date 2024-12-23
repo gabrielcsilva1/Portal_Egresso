@@ -31,7 +31,7 @@ public class Graduate {
   private UUID id;
 
   @OneToMany(mappedBy = "graduate")
-  private Set<GraduateCourse> graduateCourse;
+  private Set<GraduateCourse> graduateCourses;
 
   @OneToMany(mappedBy = "graduate")
   private Set<Position> positions;

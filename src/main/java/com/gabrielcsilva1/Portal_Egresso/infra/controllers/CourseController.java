@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateCourseDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.FetchCourseResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.UpdateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.CourseService;
+import com.gabrielcsilva1.Portal_Egresso.infra.presenters.CoursePresenter;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -40,8 +42,12 @@ public class CourseController {
   @GetMapping
   public ResponseEntity<Object> fetchCourses() {
     List<Course> listOfCourses = this.courseService.fetchCourses();
-    // TODO: Create a presenter
-    return ResponseEntity.ok(listOfCourses);
+
+    List<FetchCourseResponse> coursePresenterList = listOfCourses.stream()
+      .map(CoursePresenter::toFetchCourseResponse)
+      .toList();
+    
+    return ResponseEntity.ok(coursePresenterList);
   }
 
   @PostMapping

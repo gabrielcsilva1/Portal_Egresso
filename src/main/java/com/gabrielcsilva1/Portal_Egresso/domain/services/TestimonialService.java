@@ -43,6 +43,10 @@ public class TestimonialService {
       size = 20;
     }
 
+    if (page < 0) {
+      page = 0;
+    }
+
     Pageable pageable = PageRequest.of(page, size);
 
     Page<Testimonial> testimonials;

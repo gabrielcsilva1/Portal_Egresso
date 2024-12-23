@@ -14,13 +14,13 @@ public class GraduateFilterSpecification {
         return null;
       }
 
-      var graduateCourseJoin = root.join("graduateCourse");
+      var graduateCoursesJoin = root.join("graduateCourses");
 
-      var isStartYearGreaterOrEqualThanYear = builder.le(graduateCourseJoin.get("startYear"), year);
+      var isStartYearGreaterOrEqualThanYear = builder.le(graduateCoursesJoin.get("startYear"), year);
 
       var isEndYearLessThanOrEqualThanYear = builder.or(
-        builder.isNull(graduateCourseJoin.get("endYear")),
-        builder.ge(graduateCourseJoin.get("endYear"), year)
+        builder.isNull(graduateCoursesJoin.get("endYear")),
+        builder.ge(graduateCoursesJoin.get("endYear"), year)
       );
 
       return builder.and(
@@ -48,7 +48,7 @@ public class GraduateFilterSpecification {
         return null;
       }
 
-      var courseJoin = root.join("graduateCourse").join("course");
+      var courseJoin = root.join("graduateCourses").join("course");
 
       var courseNameInLowerCase = builder.lower(courseJoin.get("name"));
 
