@@ -17,6 +17,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.dtos.PositionDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.position.UpdatePositionDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.PositionService;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -28,21 +29,24 @@ public class PositionController {
   private PositionService positionService;
 
   @PostMapping
+  @ApiResponse( responseCode = "201", description = "Register graduate position")
   public ResponseEntity<Object> registerGraduatePosition(@Valid @RequestBody PositionDTO positionDTO) {
     this.positionService.registerGraduatePosition(positionDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 
   @PutMapping("/{positionId}")
+  @ApiResponse( responseCode = "204", description = "Graduate position updated")
   public ResponseEntity<Object> updateGraduatePosition(
     @PathVariable UUID positionId, 
     @Valid @RequestBody UpdatePositionDTO positionDTO
     ) {
     this.positionService.updateGraduatePosition(positionId, positionDTO);
-    return ResponseEntity.status(HttpStatus.OK).body(null);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
   }
 
   @DeleteMapping("/{positionId}")
+  @ApiResponse( responseCode = "204", description = "Graduate position deleted")
   public ResponseEntity<Object> deleteGraduatePosition(@PathVariable UUID positionId) {
     this.positionService.deleteGraduatePosition(positionId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);

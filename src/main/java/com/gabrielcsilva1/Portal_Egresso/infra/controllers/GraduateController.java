@@ -28,6 +28,9 @@ import com.gabrielcsilva1.Portal_Egresso.domain.services.GraduateService;
 import com.gabrielcsilva1.Portal_Egresso.infra.presenters.GraduatePresenter;
 import com.gabrielcsilva1.Portal_Egresso.infra.queryfilters.GraduateQueryFilter;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -39,7 +42,11 @@ public class GraduateController {
   GraduateService graduateService;
 
   @GetMapping
-  public ResponseEntity<Object> fetchGraduates(
+  @ApiResponse(
+    responseCode = "200",
+    description = "List of Graduates"
+  )
+  public ResponseEntity<PaginatedResponse<FetchGraduateResponse>> fetchGraduates(
     @ModelAttribute GraduateQueryFilter filters,
     @RequestParam(defaultValue = "1") Integer page
     ) {
@@ -63,13 +70,23 @@ public class GraduateController {
   }
 
   @PostMapping
-  public ResponseEntity<Object> createGraduate(@Valid @RequestBody GraduateDTO graduateDTO) {
+  @ApiResponse( responseCode = "201", description = "Graduate created")
+  public ResponseEntity<Void> createGraduate(@Valid @RequestBody GraduateDTO graduateDTO) {
     this.graduateService.createGraduate(graduateDTO);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 
   @GetMapping("/{id}")
+  @ApiResponse(
+    responseCode = "200",
+    description = "Graduate founded",
+    content = {
+      @Content(
+        schema = @Schema(implementation = GetGraduateResponse.class)
+      )
+    }
+  )
   public ResponseEntity<Object> getGraduateById(@PathVariable UUID id) {
     Graduate graduate = this.graduateService.getGraduateById(id);
 
@@ -79,16 +96,24 @@ public class GraduateController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Object> updateGraduate(
+  @ApiResponse(
+    responseCode = "204",
+    description = "Graduate updated"
+  )
+  public ResponseEntity<Void> updateGraduate(
     @PathVariable UUID id, 
     @Valid @RequestBody UpdateGraduateDTO graduateDTO) {
       this.graduateService.updateGraduate(id, graduateDTO);
 
-      return ResponseEntity.status(HttpStatus.OK).body(null);
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Object> deleteGraduate(@PathVariable UUID id) {
+  @ApiResponse(
+    responseCode = "204",
+    description = "Graduate deleted"
+  )
+  public ResponseEntity<Void> deleteGraduate(@PathVariable UUID id) {
     this.graduateService.deleteGraduate(id);
 
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);

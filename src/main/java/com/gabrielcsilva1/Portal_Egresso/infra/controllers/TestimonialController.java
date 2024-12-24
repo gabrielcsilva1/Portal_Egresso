@@ -24,6 +24,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TestimonialService;
 import com.gabrielcsilva1.Portal_Egresso.infra.presenters.TestimonialPresenter;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -35,13 +36,15 @@ public class TestimonialController {
   private TestimonialService testimonialService;
 
   @PostMapping
+  @ApiResponse(responseCode = "201", description = "Register graduate testimonial")
   public ResponseEntity<Object> registerGraduateTestimonial(@Valid @RequestBody TestimonialDTO testimonialDTO) {
     this.testimonialService.registerGraduateTestimonial(testimonialDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 
   @GetMapping
-  public ResponseEntity<Object> fetchGraduateTestimonials(
+  @ApiResponse(responseCode = "201", description = "Register graduate testimonial")
+  public ResponseEntity<PaginatedResponse<GetTestimonialResponse>> fetchGraduateTestimonials(
     @RequestParam(required = false) Integer year, 
     @RequestParam(defaultValue = "1") int page, 
     @RequestParam(defaultValue = "20") int size
@@ -64,15 +67,17 @@ public class TestimonialController {
   }
 
   @PutMapping("/{testimonialId}")
+  @ApiResponse(responseCode = "204", description = "Graduate testimonial updated")
   public ResponseEntity<Object> updateGraduateTestimonial(
     @PathVariable UUID testimonialId, 
     @Valid @RequestBody String text
     ) {
       this.testimonialService.updateGraduateTestimonial(testimonialId, text);
-      return ResponseEntity.status(HttpStatus.OK).body(null);
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
   @DeleteMapping("{testimonialId}")
+  @ApiResponse(responseCode = "204", description = "Graduate testimonial deleted")
   public ResponseEntity<Object> deleteGraduateTestimonial(@PathVariable UUID testimonialId) {
     this.testimonialService.deleteGraduateTestimonial(testimonialId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);

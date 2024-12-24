@@ -39,7 +39,7 @@ public class CourseController {
 
   @PostMapping
   @ApiResponse(responseCode = "201", description = "Course created")
-  public ResponseEntity<Object> createCourse(@Valid @RequestBody CourseDTO courseDTO) {
+  public ResponseEntity<Void> createCourse(@Valid @RequestBody CourseDTO courseDTO) {
     this.courseService.createCourse(courseDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
@@ -62,21 +62,21 @@ public class CourseController {
 
   @PostMapping("/graduate")
   @ApiResponse(responseCode = "201", description = "Graduate registered in Course")
-  public ResponseEntity<Object> registerGraduateInCourse(@Valid @RequestBody GraduateCourseDTO graduateCourseDTO) {
+  public ResponseEntity<Void> registerGraduateInCourse(@Valid @RequestBody GraduateCourseDTO graduateCourseDTO) {
     this.courseService.registerGraduateInCourse(graduateCourseDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 
   @DeleteMapping("/graduate/{id}")
   @ApiResponse(responseCode = "204", description = "Graduate unregistered in Course")
-  public ResponseEntity<Object> unregisterGraduateInCourse(@PathVariable UUID id){
+  public ResponseEntity<Void> unregisterGraduateInCourse(@PathVariable UUID id){
     this.courseService.unregisterGraduateInCourse(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
   }
 
   @PutMapping("/{id}")
   @ApiResponse(responseCode = "204", description = "Course update")
-  public ResponseEntity<Object> updateCourse(
+  public ResponseEntity<Void> updateCourse(
     @PathVariable UUID id, 
     @Valid @RequestBody UpdateCourseDTO courseDTO) {
     this.courseService.updateCourse(id, courseDTO);
@@ -86,7 +86,7 @@ public class CourseController {
 
   @DeleteMapping("/{id}")
   @ApiResponse(responseCode = "204", description = "Graduate unregistered in Course")
-  public ResponseEntity<Object> deleteCourse(@PathVariable UUID id) {
+  public ResponseEntity<Void> deleteCourse(@PathVariable UUID id) {
     this.courseService.deleteCourse(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
   }
