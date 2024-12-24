@@ -23,6 +23,10 @@ import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.CourseService;
 import com.gabrielcsilva1.Portal_Egresso.infra.presenters.CoursePresenter;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -34,12 +38,18 @@ public class CourseController {
   private CourseService courseService;
 
   @PostMapping
+  @ApiResponse(responseCode = "201", description = "Course created")
   public ResponseEntity<Object> createCourse(@Valid @RequestBody CourseDTO courseDTO) {
     this.courseService.createCourse(courseDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 
-  @GetMapping
+  @GetMapping 
+  @ApiResponse(responseCode = "200", description = "List of Courses", content = {
+    @Content(array = @ArraySchema(
+      schema = @Schema(implementation = FetchCourseResponse.class)
+    ))
+  })
   public ResponseEntity<Object> fetchCourses() {
     List<Course> listOfCourses = this.courseService.fetchCourses();
 
@@ -50,29 +60,32 @@ public class CourseController {
     return ResponseEntity.ok(coursePresenterList);
   }
 
-  @PostMapping
-  @RequestMapping("/graduate")
+  @PostMapping("/graduate")
+  @ApiResponse(responseCode = "201", description = "Graduate registered in Course")
   public ResponseEntity<Object> registerGraduateInCourse(@Valid @RequestBody GraduateCourseDTO graduateCourseDTO) {
     this.courseService.registerGraduateInCourse(graduateCourseDTO);
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 
   @DeleteMapping("/graduate/{id}")
+  @ApiResponse(responseCode = "204", description = "Graduate unregistered in Course")
   public ResponseEntity<Object> unregisterGraduateInCourse(@PathVariable UUID id){
     this.courseService.unregisterGraduateInCourse(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
   }
 
   @PutMapping("/{id}")
+  @ApiResponse(responseCode = "204", description = "Course update")
   public ResponseEntity<Object> updateCourse(
     @PathVariable UUID id, 
     @Valid @RequestBody UpdateCourseDTO courseDTO) {
-    Course course = this.courseService.updateCourse(id, courseDTO);
+    this.courseService.updateCourse(id, courseDTO);
 
-    return ResponseEntity.status(HttpStatus.OK).body(course);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
   }
 
   @DeleteMapping("/{id}")
+  @ApiResponse(responseCode = "204", description = "Graduate unregistered in Course")
   public ResponseEntity<Object> deleteCourse(@PathVariable UUID id) {
     this.courseService.deleteCourse(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
