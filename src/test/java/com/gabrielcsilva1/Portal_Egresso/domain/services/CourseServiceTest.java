@@ -54,14 +54,15 @@ public class CourseServiceTest {
   public void create_course_success() {
     // DTO
     var courseDTO = CourseDTO.builder()
-      .coordinatorId(UUID.randomUUID())
       .name("Course Name")
       .level("Graduation")
       .build();
 
+    UUID coordinatorId = UUID.randomUUID();
+
     // Mocks
     var coordinatorMock = Coordinator.builder()
-      .id(courseDTO.getCoordinatorId())
+      .id(coordinatorId)
       .build();
     
     var courseMock = Course.builder()
@@ -77,10 +78,10 @@ public class CourseServiceTest {
       .thenReturn(courseMock);
 
     // Test
-    Course result = this.sut.createCourse(courseDTO);
+    Course result = this.sut.createCourse(courseDTO, coordinatorId);
 
     assertEquals(result.getId(), courseMock.getId());
-    assertEquals(result.getCoordinator().getId(), courseDTO.getCoordinatorId());
+    assertEquals(result.getCoordinator().getId(), coordinatorId);
   }
 
   @Test
@@ -88,18 +89,20 @@ public class CourseServiceTest {
   public void create_course_coordinator_not_found_exception() {
      // DTO
      var courseDTO = CourseDTO.builder()
-     .coordinatorId(UUID.randomUUID())
      .name("Course Name")
      .level("Graduation")
      .build();
 
+     UUID coordinatorId = UUID.randomUUID();
+    
+
    // Mocks
-   when(this.coordinatorRepository.findById(courseDTO.getCoordinatorId()))
+   when(this.coordinatorRepository.findById(coordinatorId))
      .thenReturn(Optional.empty());
 
    // Test
    assertThrows(CoordinatorNotFoundException.class, () -> {
-      this.sut.createCourse(courseDTO);
+      this.sut.createCourse(courseDTO, coordinatorId);
    });
   }
 

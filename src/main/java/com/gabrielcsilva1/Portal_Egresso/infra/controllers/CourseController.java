@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.FetchCourseResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.UpdateCourseDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.CourseService;
 import com.gabrielcsilva1.Portal_Egresso.infra.presenters.CoursePresenter;
@@ -40,7 +42,10 @@ public class CourseController {
   @PostMapping
   @ApiResponse(responseCode = "201", description = "Course created")
   public ResponseEntity<Void> createCourse(@Valid @RequestBody CourseDTO courseDTO) {
-    this.courseService.createCourse(courseDTO);
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    Coordinator coordinator = (Coordinator) authentication.getPrincipal();
+
+    this.courseService.createCourse(courseDTO, coordinator.getId());
     return ResponseEntity.status(HttpStatus.CREATED).body(null);
   }
 

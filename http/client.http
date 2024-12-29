@@ -1,8 +1,21 @@
 @url = http://localhost:8080
 @coordinatorId = 
 
+@token =
+
+POST {{url}}/session
+Content-Type: application/json
+
+{
+  "login": "user",
+  "password": "123456"
+}
+
+###
+
 POST {{url}}/course
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "coordinatorId": "{{coordinatorId}}",
@@ -14,6 +27,7 @@ Content-Type: application/json
 
 POST {{url}}/graduate
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "name": "John Doe",
@@ -24,6 +38,7 @@ Content-Type: application/json
 
 POST {{url}}/course/graduate
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "graduateId": "",
@@ -35,6 +50,7 @@ Content-Type: application/json
 
 POST {{url}}/course/graduate
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "graduateId": "",
@@ -45,6 +61,7 @@ Content-Type: application/json
 ###
 POST {{url}}/graduate/testimonial
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "graduateId": "",
@@ -54,6 +71,7 @@ Content-Type: application/json
 ###
 POST {{url}}/graduate/position
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "graduateId": "",

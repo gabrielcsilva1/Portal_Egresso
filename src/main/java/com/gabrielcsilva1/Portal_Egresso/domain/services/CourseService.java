@@ -36,8 +36,8 @@ public class CourseService {
   @Autowired
   private GraduateCourseRepository graduateCourseRepository;
 
-  public Course createCourse(CourseDTO courseDTO) {
-    var coordinator = this.coordinatorRepository.findById(courseDTO.getCoordinatorId());
+  public Course createCourse(CourseDTO courseDTO, UUID coordinatorId) {
+    var coordinator = this.coordinatorRepository.findById(coordinatorId);
 
     if (coordinator.isEmpty()) {
       throw new CoordinatorNotFoundException();

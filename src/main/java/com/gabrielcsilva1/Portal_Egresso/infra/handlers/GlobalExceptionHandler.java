@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -48,7 +50,7 @@ public class GlobalExceptionHandler {
   public ResponseEntity<Map<String, String>> handleCoordinatorNotFoundException(CoordinatorNotFoundException exception) {
     Map<String, String> error = new HashMap<>();
     error.put("error", "Bad request");
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }
 
   @ExceptionHandler(CourseNotFoundException.class)
@@ -90,6 +92,20 @@ public class GlobalExceptionHandler {
   public ResponseEntity<Map<String, String>> handleInvalidInvalidCredentialsException(InvalidCredentialsException exception) {
     Map<String, String> error = new HashMap<>();
     error.put("error", exception.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+  }
+
+  @ExceptionHandler(BadCredentialsException.class)
+  public ResponseEntity<Map<String, String>> handleInvalidBadCredentialsException(BadCredentialsException exception) {
+    Map<String, String> error = new HashMap<>();
+    error.put("error", exception.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+  }
+
+  @ExceptionHandler(InternalAuthenticationServiceException.class)
+  public ResponseEntity<Map<String, String>> handleInternalAuthenticationServiceException(InternalAuthenticationServiceException exception) {
+    Map<String, String> error = new HashMap<>();
+    error.put("error", "Login/password incorrect");
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }
 
