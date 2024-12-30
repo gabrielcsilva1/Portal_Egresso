@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
@@ -21,6 +22,7 @@ import com.gabrielcsilva1.Portal_Egresso.infra.queryfilters.GraduateQueryFilter;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Transactional
 public class GraduateRepositoryTest {
   @Autowired
   private GraduateRepository graduateRepository;

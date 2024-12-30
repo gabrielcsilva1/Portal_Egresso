@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.AuthenticationDTO;
@@ -22,6 +23,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorReposito
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 @ActiveProfiles("test")
 public class AuthenticationControllerTest {
 
@@ -41,12 +43,12 @@ public class AuthenticationControllerTest {
 
   @BeforeEach
   public void setUp() {
-    Coordinator coordinator = Coordinator.builder()
-      .login("admin2")
+    Coordinator coordinatorToSave = Coordinator.builder()
+      .login("admin")
       .password(passwordEncoder.encode("admin"))
       .build();
 
-    this.coordinator = coordinatorRepository.save(coordinator);
+    this.coordinator = coordinatorRepository.save(coordinatorToSave);
   }
 
   @Test
