@@ -10,8 +10,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.AuthenticationDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.authentication.AuthenticationResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TokenService;
+
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 public class AuthenticationController {
@@ -21,14 +25,18 @@ public class AuthenticationController {
   @Autowired
   private TokenService tokenService;
 
-  @PostMapping("/session")
-  public ResponseEntity<String> login(@RequestBody AuthenticationDTO authenticationDTO) {
+  @PostMapping("coordinator/session")
+  @Tag(name = "Coordinator")
+  @ApiResponse(responseCode = "200", description = "Login was successful")
+  public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationDTO authenticationDTO) {
     var usernamePassword = new UsernamePasswordAuthenticationToken(authenticationDTO.getLogin(), authenticationDTO.getPassword());
 
     var auth = this.authenticationManager.authenticate(usernamePassword);
 
     var token = this.tokenService.generateToken((Coordinator) auth.getPrincipal());
 
-    return ResponseEntity.status(HttpStatus.OK).body(token);
+    AuthenticationResponse response = new AuthenticationResponse(token);
+
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 }

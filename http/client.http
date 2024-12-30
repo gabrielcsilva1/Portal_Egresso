@@ -3,7 +3,7 @@
 
 @token =
 
-POST {{url}}/session
+POST {{url}}/coordinator/session
 Content-Type: application/json
 
 {

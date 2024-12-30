@@ -2,6 +2,7 @@ package com.gabrielcsilva1.Portal_Egresso.seeder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +10,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
 
 @Component
+@Profile("dev")
 public class DatabaseSeeder implements CommandLineRunner {
 
   @Autowired
@@ -19,6 +21,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws Exception {
+
     if (coordinatorRepository.count() == 0) {
       Coordinator coordinator1 = Coordinator.builder()
         .login("admin")

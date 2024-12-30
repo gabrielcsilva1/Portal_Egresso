@@ -27,7 +27,7 @@ public class SecurityConfiguration {
       .authorizeHttpRequests(authorize -> {
         authorize
          .requestMatchers(HttpMethod.GET, "/").permitAll()
-         .requestMatchers(HttpMethod.POST, "/session").permitAll()
+         .requestMatchers(HttpMethod.POST, "/coordinator/session").permitAll()
          .anyRequest().authenticated();
       })
       .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
