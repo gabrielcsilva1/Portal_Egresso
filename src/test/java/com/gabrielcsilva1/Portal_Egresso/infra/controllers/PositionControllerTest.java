@@ -35,7 +35,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.services.TokenService;
 @Transactional
 @ActiveProfiles("test")
 public class PositionControllerTest {
-   @Autowired
+  @Autowired
   private MockMvc mockMvc;
 
   @Autowired

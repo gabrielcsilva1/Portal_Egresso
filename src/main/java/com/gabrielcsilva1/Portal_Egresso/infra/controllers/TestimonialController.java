@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.TestimonialDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.paginated.PaginatedResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.testimonial.GetTestimonialResponse;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.testimonial.UpdateTestimonialDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TestimonialService;
 import com.gabrielcsilva1.Portal_Egresso.infra.presenters.TestimonialPresenter;
@@ -70,9 +71,9 @@ public class TestimonialController {
   @ApiResponse(responseCode = "204", description = "Graduate testimonial updated")
   public ResponseEntity<Object> updateGraduateTestimonial(
     @PathVariable UUID testimonialId, 
-    @Valid @RequestBody String text
+    @Valid @RequestBody UpdateTestimonialDTO testimonialDTO
     ) {
-      this.testimonialService.updateGraduateTestimonial(testimonialId, text);
+      this.testimonialService.updateGraduateTestimonial(testimonialId, testimonialDTO.getText());
       return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
