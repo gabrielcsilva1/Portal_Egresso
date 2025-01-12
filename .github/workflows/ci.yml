@@ -16,6 +16,9 @@ jobs:
         with:
           java-version: 23
           distribution: 'temurin'
+
+      - name: Copy env file
+        run: cp .env.example .env
       
       - name: Running tests
         run: mvn clean test
