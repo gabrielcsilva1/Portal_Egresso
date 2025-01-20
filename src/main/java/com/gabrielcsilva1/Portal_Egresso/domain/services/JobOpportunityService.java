@@ -23,7 +23,7 @@ public class JobOpportunityService {
   @Autowired
   private GraduateRepository graduateRepository;
 
-  public JobOpportunity createJobOpportunity(JobOpportunityDTO jobOpportunityDTO) {
+  public JobOpportunity create(JobOpportunityDTO jobOpportunityDTO) {
     Graduate graduate = graduateRepository.findById(jobOpportunityDTO.getGraduateId())
       .orElseThrow(() -> new GraduateNotFoundException());
 
@@ -36,12 +36,13 @@ public class JobOpportunityService {
     return jobOpportunityRepository.save(jobOpportunity);
   }
 
-  public JobOpportunity updateJobOpportunity(UpdateJobOpportunityDTO jobOpportunityDTO) {
-    JobOpportunity jobOpportunity = jobOpportunityRepository.findById(jobOpportunityDTO.getJobOpportunityId())
+  public JobOpportunity update(UUID id, UpdateJobOpportunityDTO jobOpportunityDTO) {
+    JobOpportunity jobOpportunity = jobOpportunityRepository.findById(id)
       .orElseThrow(() -> new ResourceNotFoundException());
     
     jobOpportunity.setTitle(jobOpportunityDTO.getTitle());
     jobOpportunity.setDescription(jobOpportunityDTO.getDescription());
+    jobOpportunity.setIsVerified(false);
 
     return jobOpportunityRepository.save(jobOpportunity);
   }
@@ -54,7 +55,7 @@ public class JobOpportunityService {
     return jobOpportunityRepository.findByIsVerifiedFalse();
   }
 
-  public void deleteJobOpportunity(UUID jobId) {
+  public void delete(UUID jobId) {
     JobOpportunity jobOpportunity = jobOpportunityRepository.findById(jobId)
      .orElseThrow(() -> new ResourceNotFoundException());
 

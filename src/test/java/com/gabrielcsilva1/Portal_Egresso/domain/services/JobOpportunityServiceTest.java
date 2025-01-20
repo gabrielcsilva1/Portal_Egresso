@@ -49,7 +49,7 @@ public class JobOpportunityServiceTest {
     when(this.jobOpportunityRepository.save(any(JobOpportunity.class)))
     .thenAnswer(invocation -> invocation.getArgument(0));
 
-    JobOpportunity result = this.sut.createJobOpportunity(dto);
+    JobOpportunity result = this.sut.create(dto);
 
     assertEquals(result.getTitle(), dto.getTitle());
     assertEquals(result.getDescription(), dto.getDescription());
@@ -57,14 +57,14 @@ public class JobOpportunityServiceTest {
 
   @Test
   public void update_job_opportunity_success() {
+    UUID jobOpportunityId = UUID.randomUUID();
     UpdateJobOpportunityDTO dto = UpdateJobOpportunityDTO.builder()
-    .jobOpportunityId(UUID.randomUUID())
     .title("New Job title")
     .description("New Job description")
     .build();
 
     var jobOpportunityMock = JobOpportunity.builder()
-    .id(dto.getJobOpportunityId())
+    .id(jobOpportunityId)
     .title("Old Job title")
     .description("Old Job description")
     .build();
@@ -75,7 +75,7 @@ public class JobOpportunityServiceTest {
     when(this.jobOpportunityRepository.save(any(JobOpportunity.class)))
     .thenAnswer(invocation -> invocation.getArgument(0));
 
-    JobOpportunity result = this.sut.updateJobOpportunity(dto);
+    JobOpportunity result = this.sut.update(jobOpportunityId, dto);
 
     assertEquals(result.getTitle(), dto.getTitle());
     assertEquals(result.getDescription(), dto.getDescription());
