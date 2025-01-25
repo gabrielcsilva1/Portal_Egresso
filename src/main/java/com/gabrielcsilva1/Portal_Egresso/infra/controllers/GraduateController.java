@@ -25,7 +25,6 @@ import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.UpdateGraduateDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.paginated.PaginatedResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.GraduateService;
-import com.gabrielcsilva1.Portal_Egresso.infra.presenters.GraduatePresenter;
 import com.gabrielcsilva1.Portal_Egresso.infra.queryfilters.GraduateQueryFilter;
 
 import io.swagger.v3.oas.annotations.media.Content;
@@ -53,7 +52,7 @@ public class GraduateController {
     Page<Graduate> filteredGraduates = this.graduateService.fetchGraduates(filters.toSpecification(), page-1);
 
     List<FetchGraduateResponse> graduatePresenterList = filteredGraduates.getContent().stream()
-    .map(GraduatePresenter::toFetchGraduateResponse)
+    .map(FetchGraduateResponse::toResponse)
     .toList();
 
 
@@ -90,7 +89,7 @@ public class GraduateController {
   public ResponseEntity<Object> getGraduateById(@PathVariable UUID id) {
     Graduate graduate = this.graduateService.getGraduateById(id);
 
-    GetGraduateResponse graduatePresenter = GraduatePresenter.toGetGraduateResponse(graduate);
+    GetGraduateResponse graduatePresenter = GetGraduateResponse.toResponse(graduate);
 
     return ResponseEntity.status(HttpStatus.OK).body(graduatePresenter);
   }

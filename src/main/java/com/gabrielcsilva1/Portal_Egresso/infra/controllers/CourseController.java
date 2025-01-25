@@ -23,7 +23,6 @@ import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.UpdateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.CourseService;
-import com.gabrielcsilva1.Portal_Egresso.infra.presenters.CoursePresenter;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -59,7 +58,7 @@ public class CourseController {
     List<Course> listOfCourses = this.courseService.fetchCourses();
 
     List<FetchCourseResponse> coursePresenterList = listOfCourses.stream()
-      .map(CoursePresenter::toFetchCourseResponse)
+      .map(FetchCourseResponse::toResponse)
       .toList();
     
     return ResponseEntity.ok(coursePresenterList);

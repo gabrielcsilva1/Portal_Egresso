@@ -23,7 +23,6 @@ import com.gabrielcsilva1.Portal_Egresso.domain.dtos.testimonial.GetTestimonialR
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.testimonial.UpdateTestimonialDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TestimonialService;
-import com.gabrielcsilva1.Portal_Egresso.infra.presenters.TestimonialPresenter;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -54,7 +53,7 @@ public class TestimonialController {
 
     List<GetTestimonialResponse> testimonialPresenter = testimonialsPaginated.getContent()
       .stream()
-      .map(TestimonialPresenter::toGetTestimonialResponse)
+      .map(GetTestimonialResponse::toResponse)
       .toList();
 
     PaginatedResponse<GetTestimonialResponse> testimonialPresenterPaginated = new PaginatedResponse<>(
