@@ -25,7 +25,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.TestimonialDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.paginated.PaginatedResponse;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.testimonial.GetTestimonialResponse;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.testimonial.TestimonialResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.testimonial.UpdateTestimonialDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
@@ -133,9 +133,9 @@ public class TestimonialControllerTest {
     );
 
     String jsonResponse = result.andReturn().getResponse().getContentAsString();
-    PaginatedResponse<GetTestimonialResponse> fetchTestimonialsResponse = objectMapper.readValue(
+    PaginatedResponse<TestimonialResponse> fetchTestimonialsResponse = objectMapper.readValue(
       jsonResponse,
-      new TypeReference<PaginatedResponse<GetTestimonialResponse>>(){}
+      new TypeReference<PaginatedResponse<TestimonialResponse>>(){}
     );
 
     assertThat(fetchTestimonialsResponse.getContent()).isNotNull();

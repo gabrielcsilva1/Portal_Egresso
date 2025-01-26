@@ -24,7 +24,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateCourseDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.FetchCourseResponse;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.CourseResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.UpdateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
@@ -130,9 +130,9 @@ public class CourseControllerTest {
     result.andExpect(MockMvcResultMatchers.status().isOk());
     
     String jsonResponse = result.andReturn().getResponse().getContentAsString();
-    List<FetchCourseResponse> fetchCourseResponses = objectMapper.readValue(
+    List<CourseResponse> fetchCourseResponses = objectMapper.readValue(
       jsonResponse,
-      new TypeReference<List<FetchCourseResponse>>() {}
+      new TypeReference<List<CourseResponse>>() {}
     );
 
     assertThat(fetchCourseResponses).hasSize(2);

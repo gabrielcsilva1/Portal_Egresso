@@ -18,15 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateCourseDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.FetchCourseResponse;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.CourseResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.UpdateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.CourseService;
 
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -40,25 +37,34 @@ public class CourseController {
 
   @PostMapping
   @ApiResponse(responseCode = "201", description = "Course created")
-  public ResponseEntity<Void> createCourse(@Valid @RequestBody CourseDTO courseDTO) {
+  public ResponseEntity<CourseResponse> createCourse(@Valid @RequestBody CourseDTO courseDTO) {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
     Coordinator coordinator = (Coordinator) authentication.getPrincipal();
 
-    this.courseService.createCourse(courseDTO, coordinator.getId());
-    return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    Course course = this.courseService.createCourse(courseDTO, coordinator.getId());
+    
+    return ResponseEntity.status(HttpStatus.CREATED).body(
+      CourseResponse.toResponse(course)
+    );
+  }
+
+  @PutMapping("/{id}")
+  @ApiResponse(responseCode = "204", description = "Course update")
+  public ResponseEntity<Void> updateCourse(
+    @PathVariable UUID id, 
+    @Valid @RequestBody UpdateCourseDTO courseDTO) {
+    this.courseService.updateCourse(id, courseDTO);
+
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
   }
 
   @GetMapping 
-  @ApiResponse(responseCode = "200", description = "List of Courses", content = {
-    @Content(array = @ArraySchema(
-      schema = @Schema(implementation = FetchCourseResponse.class)
-    ))
-  })
-  public ResponseEntity<Object> fetchCourses() {
+  @ApiResponse(responseCode = "200", description = "List of Courses")
+  public ResponseEntity<List<CourseResponse>> fetchCourses() {
     List<Course> listOfCourses = this.courseService.fetchCourses();
 
-    List<FetchCourseResponse> coursePresenterList = listOfCourses.stream()
-      .map(FetchCourseResponse::toResponse)
+    List<CourseResponse> coursePresenterList = listOfCourses.stream()
+      .map(CourseResponse::toResponse)
       .toList();
     
     return ResponseEntity.ok(coursePresenterList);
@@ -75,16 +81,6 @@ public class CourseController {
   @ApiResponse(responseCode = "204", description = "Graduate unregistered in Course")
   public ResponseEntity<Void> unregisterGraduateInCourse(@PathVariable UUID id){
     this.courseService.unregisterGraduateInCourse(id);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-  }
-
-  @PutMapping("/{id}")
-  @ApiResponse(responseCode = "204", description = "Course update")
-  public ResponseEntity<Void> updateCourse(
-    @PathVariable UUID id, 
-    @Valid @RequestBody UpdateCourseDTO courseDTO) {
-    this.courseService.updateCourse(id, courseDTO);
-
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
   }
 

@@ -9,15 +9,15 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class GetPositionResponse {
+public class PositionResponse {
   private UUID id;
   private String description;
   private String location;
   private Integer startYear;
   private Integer endYear;
 
-  public static GetPositionResponse toResponse(Position position) {
-    return GetPositionResponse.builder()
+  public static PositionResponse toResponse(Position position) {
+    return PositionResponse.builder()
       .id(position.getId())
       .description(position.getDescription())
       .location(position.getLocation())

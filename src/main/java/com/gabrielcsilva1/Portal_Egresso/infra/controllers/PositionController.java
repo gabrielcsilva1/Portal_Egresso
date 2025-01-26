@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.PositionDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.position.PositionResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.position.UpdatePositionDTO;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Position;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.PositionService;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,14 +32,16 @@ public class PositionController {
 
   @PostMapping
   @ApiResponse( responseCode = "201", description = "Register graduate position")
-  public ResponseEntity<Object> registerGraduatePosition(@Valid @RequestBody PositionDTO positionDTO) {
-    this.positionService.registerGraduatePosition(positionDTO);
-    return ResponseEntity.status(HttpStatus.CREATED).body(null);
+  public ResponseEntity<PositionResponse> registerGraduatePosition(@Valid @RequestBody PositionDTO positionDTO) {
+    Position position = this.positionService.registerGraduatePosition(positionDTO);
+    return ResponseEntity.status(HttpStatus.CREATED).body(
+      PositionResponse.toResponse(position)
+    );
   }
 
   @PutMapping("/{positionId}")
   @ApiResponse( responseCode = "204", description = "Graduate position updated")
-  public ResponseEntity<Object> updateGraduatePosition(
+  public ResponseEntity<Void> updateGraduatePosition(
     @PathVariable UUID positionId, 
     @Valid @RequestBody UpdatePositionDTO positionDTO
     ) {
@@ -47,7 +51,7 @@ public class PositionController {
 
   @DeleteMapping("/{positionId}")
   @ApiResponse( responseCode = "204", description = "Graduate position deleted")
-  public ResponseEntity<Object> deleteGraduatePosition(@PathVariable UUID positionId) {
+  public ResponseEntity<Void> deleteGraduatePosition(@PathVariable UUID positionId) {
     this.positionService.deleteGraduatePosition(positionId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
   }

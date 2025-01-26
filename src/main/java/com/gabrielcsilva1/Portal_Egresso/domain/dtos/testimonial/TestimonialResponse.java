@@ -10,14 +10,14 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class GetTestimonialResponse {
+public class TestimonialResponse {
   private UUID id;
   private UUID graduateId;
   private String text;
   private LocalDateTime createdAt;
 
-  public static GetTestimonialResponse toResponse(Testimonial testimonial) {
-    return GetTestimonialResponse.builder()
+  public static TestimonialResponse toResponse(Testimonial testimonial) {
+    return TestimonialResponse.builder()
       .id(testimonial.getId())
       .graduateId(testimonial.getGraduate().getId())
       .text(testimonial.getText())

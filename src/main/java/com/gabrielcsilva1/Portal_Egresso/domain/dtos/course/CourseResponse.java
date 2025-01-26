@@ -9,13 +9,13 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class FetchCourseResponse {
+public class CourseResponse {
   private UUID id;
   private String name;
   private String level;
 
-  public static FetchCourseResponse toResponse(Course course) {
-    return FetchCourseResponse.builder()
+  public static CourseResponse toResponse(Course course) {
+    return CourseResponse.builder()
       .id(course.getId())
       .name(course.getName())
       .level(course.getLevel())

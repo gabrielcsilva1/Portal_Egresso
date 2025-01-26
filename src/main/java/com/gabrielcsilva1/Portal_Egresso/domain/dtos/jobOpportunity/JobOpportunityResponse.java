@@ -9,14 +9,14 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class FetchJobOpportunityResponseDTO {
+public class JobOpportunityResponse {
   private UUID id;
   private String title;
   private String description;
   private Boolean isVerified;
 
-  public static FetchJobOpportunityResponseDTO toResponse(JobOpportunity jobOpportunity) {
-    return FetchJobOpportunityResponseDTO.builder()
+  public static JobOpportunityResponse toResponse(JobOpportunity jobOpportunity) {
+    return JobOpportunityResponse.builder()
       .id(jobOpportunity.getId())
       .title(jobOpportunity.getTitle())
       .description(jobOpportunity.getDescription())

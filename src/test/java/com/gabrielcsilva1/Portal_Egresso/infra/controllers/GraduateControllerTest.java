@@ -20,7 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.FetchGraduateResponse;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.GetGraduateResponse;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.GraduateResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.UpdateGraduateDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.paginated.PaginatedResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
@@ -135,9 +135,9 @@ public class GraduateControllerTest {
     );
 
     String jsonResponse = result.andReturn().getResponse().getContentAsString();
-    GetGraduateResponse getGraduateResponse = objectMapper.readValue(
+    GraduateResponse getGraduateResponse = objectMapper.readValue(
       jsonResponse,
-      GetGraduateResponse.class
+      GraduateResponse.class
     );
 
     assertThat(getGraduateResponse).isNotNull();

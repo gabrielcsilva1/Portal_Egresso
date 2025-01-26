@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.TestimonialDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.paginated.PaginatedResponse;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.testimonial.GetTestimonialResponse;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.testimonial.TestimonialResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.testimonial.UpdateTestimonialDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TestimonialService;
@@ -37,26 +37,29 @@ public class TestimonialController {
 
   @PostMapping
   @ApiResponse(responseCode = "201", description = "Register graduate testimonial")
-  public ResponseEntity<Object> registerGraduateTestimonial(@Valid @RequestBody TestimonialDTO testimonialDTO) {
-    this.testimonialService.registerGraduateTestimonial(testimonialDTO);
-    return ResponseEntity.status(HttpStatus.CREATED).body(null);
+  public ResponseEntity<TestimonialResponse> registerGraduateTestimonial(@Valid @RequestBody TestimonialDTO testimonialDTO) {
+    Testimonial testimonial = this.testimonialService.registerGraduateTestimonial(testimonialDTO);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(
+      TestimonialResponse.toResponse(testimonial)
+    );
   }
 
   @GetMapping
   @ApiResponse(responseCode = "201", description = "Register graduate testimonial")
-  public ResponseEntity<PaginatedResponse<GetTestimonialResponse>> fetchGraduateTestimonials(
+  public ResponseEntity<PaginatedResponse<TestimonialResponse>> fetchGraduateTestimonials(
     @RequestParam(required = false) Integer year, 
     @RequestParam(defaultValue = "1") int page, 
     @RequestParam(defaultValue = "20") int size
     ) {
     Page<Testimonial> testimonialsPaginated = this.testimonialService.fetchTestimonials(year, page-1, size);
 
-    List<GetTestimonialResponse> testimonialPresenter = testimonialsPaginated.getContent()
+    List<TestimonialResponse> testimonialPresenter = testimonialsPaginated.getContent()
       .stream()
-      .map(GetTestimonialResponse::toResponse)
+      .map(TestimonialResponse::toResponse)
       .toList();
 
-    PaginatedResponse<GetTestimonialResponse> testimonialPresenterPaginated = new PaginatedResponse<>(
+    PaginatedResponse<TestimonialResponse> testimonialPresenterPaginated = new PaginatedResponse<>(
       testimonialPresenter,
       testimonialsPaginated.getNumber(),
       testimonialsPaginated.getTotalPages(),
@@ -68,7 +71,7 @@ public class TestimonialController {
 
   @PutMapping("/{testimonialId}")
   @ApiResponse(responseCode = "204", description = "Graduate testimonial updated")
-  public ResponseEntity<Object> updateGraduateTestimonial(
+  public ResponseEntity<Void> updateGraduateTestimonial(
     @PathVariable UUID testimonialId, 
     @Valid @RequestBody UpdateTestimonialDTO testimonialDTO
     ) {
@@ -78,7 +81,7 @@ public class TestimonialController {
 
   @DeleteMapping("{testimonialId}")
   @ApiResponse(responseCode = "204", description = "Graduate testimonial deleted")
-  public ResponseEntity<Object> deleteGraduateTestimonial(@PathVariable UUID testimonialId) {
+  public ResponseEntity<Void> deleteGraduateTestimonial(@PathVariable UUID testimonialId) {
     this.testimonialService.deleteGraduateTestimonial(testimonialId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
   }

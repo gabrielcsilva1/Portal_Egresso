@@ -3,8 +3,8 @@ package com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate;
 import java.util.List;
 import java.util.UUID;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.FetchCourseResponse;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.position.GetPositionResponse;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.CourseResponse;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.position.PositionResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 
 import lombok.Builder;
@@ -12,10 +12,10 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class GetGraduateResponse {
+public class GraduateResponse {
   private UUID id;
-  private List<FetchCourseResponse> courses;
-  private List<GetPositionResponse> positions;
+  private List<CourseResponse> courses;
+  private List<PositionResponse> positions;
   private String name;
   private String email;
   private String description;
@@ -25,20 +25,20 @@ public class GetGraduateResponse {
   private String curriculum;
 
 
-  public static GetGraduateResponse toResponse(Graduate graduate) {
-    List<FetchCourseResponse> courses = graduate.getGraduateCourses()
+  public static GraduateResponse toResponse(Graduate graduate) {
+    List<CourseResponse> courses = graduate.getGraduateCourses()
       .stream()
       .map((graduateCourse) -> {
-        return FetchCourseResponse.toResponse(graduateCourse.getCourse());
+        return CourseResponse.toResponse(graduateCourse.getCourse());
       }).toList();
     
-    List<GetPositionResponse> positions = graduate.getPositions()
+    List<PositionResponse> positions = graduate.getPositions()
       .stream()
       .map((graduatePosition) -> {
-        return GetPositionResponse.toResponse(graduatePosition);
+        return PositionResponse.toResponse(graduatePosition);
       }).toList();
 
-    return GetGraduateResponse.builder()
+    return GraduateResponse.builder()
       .id(graduate.getId())
       .courses(courses)
       .positions(positions)

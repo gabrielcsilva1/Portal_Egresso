@@ -20,15 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.FetchGraduateResponse;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.GetGraduateResponse;
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.GraduateResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.UpdateGraduateDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.paginated.PaginatedResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.GraduateService;
 import com.gabrielcsilva1.Portal_Egresso.infra.queryfilters.GraduateQueryFilter;
 
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -41,10 +39,7 @@ public class GraduateController {
   GraduateService graduateService;
 
   @GetMapping
-  @ApiResponse(
-    responseCode = "200",
-    description = "List of Graduates"
-  )
+  @ApiResponse( responseCode = "200", description = "List of Graduates")
   public ResponseEntity<PaginatedResponse<FetchGraduateResponse>> fetchGraduates(
     @ModelAttribute GraduateQueryFilter filters,
     @RequestParam(defaultValue = "1") Integer page
@@ -70,35 +65,26 @@ public class GraduateController {
 
   @PostMapping
   @ApiResponse( responseCode = "201", description = "Graduate created")
-  public ResponseEntity<Void> createGraduate(@Valid @RequestBody GraduateDTO graduateDTO) {
-    this.graduateService.createGraduate(graduateDTO);
+  public ResponseEntity<GraduateResponse> createGraduate(@Valid @RequestBody GraduateDTO graduateDTO) {
+    Graduate graduate = this.graduateService.createGraduate(graduateDTO);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    return ResponseEntity.status(HttpStatus.CREATED).body(
+      GraduateResponse.toResponse(graduate)
+      );
   }
 
   @GetMapping("/{id}")
-  @ApiResponse(
-    responseCode = "200",
-    description = "Graduate founded",
-    content = {
-      @Content(
-        schema = @Schema(implementation = GetGraduateResponse.class)
-      )
-    }
-  )
-  public ResponseEntity<Object> getGraduateById(@PathVariable UUID id) {
+  @ApiResponse( responseCode = "200", description = "Graduate founded")
+  public ResponseEntity<GraduateResponse> getGraduateById(@PathVariable UUID id) {
     Graduate graduate = this.graduateService.getGraduateById(id);
 
-    GetGraduateResponse graduatePresenter = GetGraduateResponse.toResponse(graduate);
-
-    return ResponseEntity.status(HttpStatus.OK).body(graduatePresenter);
+    return ResponseEntity.status(HttpStatus.OK).body(
+      GraduateResponse.toResponse(graduate)
+    );
   }
 
   @PutMapping("/{id}")
-  @ApiResponse(
-    responseCode = "204",
-    description = "Graduate updated"
-  )
+  @ApiResponse( responseCode = "204", description = "Graduate updated")
   public ResponseEntity<Void> updateGraduate(
     @PathVariable UUID id, 
     @Valid @RequestBody UpdateGraduateDTO graduateDTO) {
@@ -108,10 +94,7 @@ public class GraduateController {
     }
 
   @DeleteMapping("/{id}")
-  @ApiResponse(
-    responseCode = "204",
-    description = "Graduate deleted"
-  )
+  @ApiResponse( responseCode = "204", description = "Graduate deleted")
   public ResponseEntity<Void> deleteGraduate(@PathVariable UUID id) {
     this.graduateService.deleteGraduate(id);
 
