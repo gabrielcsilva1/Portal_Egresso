@@ -90,7 +90,7 @@ public class TestimonialControllerTest {
 
   @Test
   public void register_graduate_testimonial() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator);
+    String accessToken = tokenService.generateToken(coordinator.getId().toString());
 
     TestimonialDTO testimonialDTO = TestimonialDTO.builder()
       .graduateId(graduate.getId())
@@ -145,7 +145,7 @@ public class TestimonialControllerTest {
 
   @Test
   public void update_graduate_testimonial() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator);
+    String accessToken = tokenService.generateToken(coordinator.getId().toString());
 
     Testimonial testimonialInDatabase = Testimonial.builder()
       .graduate(graduate)
@@ -175,7 +175,7 @@ public class TestimonialControllerTest {
 
   @Test
   public void delete_graduate_testimonial() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator);
+    String accessToken = tokenService.generateToken(coordinator.getId().toString());
 
     Testimonial testimonialInDatabase = Testimonial.builder()
       .graduate(graduate)

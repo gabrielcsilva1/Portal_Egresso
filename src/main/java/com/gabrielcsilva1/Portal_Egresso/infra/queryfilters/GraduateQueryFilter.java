@@ -1,6 +1,6 @@
 package com.gabrielcsilva1.Portal_Egresso.infra.queryfilters;
 
-import static com.gabrielcsilva1.Portal_Egresso.domain.specifications.GraduateFilterSpecification.*;
+import static com.gabrielcsilva1.Portal_Egresso.domain.repositories.specifications.GraduateFilterSpecification.*;
 
 import org.springframework.data.jpa.domain.Specification;
 

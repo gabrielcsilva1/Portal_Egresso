@@ -84,7 +84,7 @@ public class PositionControllerTest {
 
   @Test
   public void register_graduate_position_controller_success() throws Exception{
-    String accessToken = tokenService.generateToken(coordinator);
+    String accessToken = tokenService.generateToken(coordinator.getId().toString());
 
     PositionDTO positionDTO = PositionDTO.builder()
       .graduateId(graduate.getId())
@@ -109,7 +109,7 @@ public class PositionControllerTest {
 
   @Test
   public void update_graduate_position_success() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator);
+    String accessToken = tokenService.generateToken(coordinator.getId().toString());
 
     Position positionInDatabase = Position.builder()
       .graduate(graduate)
@@ -148,7 +148,7 @@ public class PositionControllerTest {
 
   @Test
   public void delete_graduate_position_success() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator);
+    String accessToken = tokenService.generateToken(coordinator.getId().toString());
 
     Position positionInDatabase = Position.builder()
       .graduate(graduate)

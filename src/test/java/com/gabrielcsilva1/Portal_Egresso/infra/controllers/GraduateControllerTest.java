@@ -57,7 +57,7 @@ public class GraduateControllerTest {
 
     coordinator = coordinatorRepository.save(coordinator);
 
-    String accessToken = tokenService.generateToken(coordinator);
+    String accessToken = tokenService.generateToken(coordinator.getId().toString());
     return accessToken;
   }
 

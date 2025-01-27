@@ -11,18 +11,17 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 
 @Service
 public class TokenService {
   @Value("${api.security.token.secret}")
   private String secret;
 
-  public String generateToken(Coordinator coordinator) {
+  public String generateToken(String subject) {
     try {
       Algorithm algorithm = Algorithm.HMAC256(this.secret);
       String token = JWT.create()
-        .withSubject(coordinator.getId().toString())
+        .withSubject(subject)
         .withExpiresAt(this.generateExpirationDate())
         .sign(algorithm);
 

@@ -2,6 +2,8 @@ package com.gabrielcsilva1.Portal_Egresso.domain.dtos;
 
 import org.hibernate.validator.constraints.URL;
 
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -31,4 +33,16 @@ public class GraduateDTO {
   private String instagram;
 
   private String curriculum;
+  
+  public Graduate toEntity() {
+    return Graduate.builder()
+        .name(name)
+        .email(email)
+        .description(description)
+        .avatarUrl(avatarUrl)
+        .linkedin(linkedin)
+        .instagram(instagram)
+        .curriculum(curriculum)
+        .build();
+  }
 }

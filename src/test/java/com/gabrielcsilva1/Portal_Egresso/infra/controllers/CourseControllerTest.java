@@ -86,7 +86,7 @@ public class CourseControllerTest {
 
   @Test
   public void create_course_controller_success() throws Exception {
-    accessToken = tokenService.generateToken(coordinator);
+    accessToken = tokenService.generateToken(coordinator.getId().toString());
 
     CourseDTO courseDTO = new CourseDTO("Ciências da Computação", "Graduação");
 
@@ -140,7 +140,7 @@ public class CourseControllerTest {
 
   @Test
   public void register_graduate_in_course_controller_success() throws Exception {
-    accessToken = tokenService.generateToken(coordinator);
+    accessToken = tokenService.generateToken(coordinator.getId().toString());
 
     Course courseInDatabase = Course.builder()
       .coordinator(coordinator)
@@ -182,7 +182,7 @@ public class CourseControllerTest {
 
   @Test
   public void unregister_graduate_in_course_controller_success() throws Exception {
-    accessToken = tokenService.generateToken(coordinator);
+    accessToken = tokenService.generateToken(coordinator.getId().toString());
 
     Course courseInDatabase = Course.builder()
       .coordinator(coordinator)
@@ -221,7 +221,7 @@ public class CourseControllerTest {
 
   @Test
   public void update_course_controller_success() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator);
+    String accessToken = tokenService.generateToken(coordinator.getId().toString());
 
     UpdateCourseDTO courseDTO = UpdateCourseDTO.builder()
       .name("New name")
@@ -254,7 +254,7 @@ public class CourseControllerTest {
 
   @Test
   public void delete_course_controller_success() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator);
+    String accessToken = tokenService.generateToken(coordinator.getId().toString());
     
     Course courseInDatabase = Course.builder()
       .coordinator(coordinator)

@@ -29,7 +29,7 @@ public class GraduateService {
       throw new GraduateAlreadyExistsException("email", graduateDTO.getEmail());
     }
 
-    Graduate graduate = new Graduate(graduateDTO);
+    Graduate graduate = graduateDTO.toEntity();
 
     return this.graduateRepository.save(graduate);
   }

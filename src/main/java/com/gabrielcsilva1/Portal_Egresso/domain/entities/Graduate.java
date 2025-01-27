@@ -1,9 +1,8 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.entities;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,11 +29,13 @@ public class Graduate {
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
+  @Builder.Default
   @OneToMany(mappedBy = "graduate")
-  private Set<GraduateCourse> graduateCourses;
+  private Set<GraduateCourse> graduateCourses = new HashSet<>();;
 
+  @Builder.Default
   @OneToMany(mappedBy = "graduate")
-  private Set<Position> positions;
+  private Set<Position> positions = new HashSet<>();;
   
   @Column(nullable = false)
   private String name;
@@ -55,14 +56,4 @@ public class Graduate {
 
   @Column(name = "curriculum")
   private String curriculum;
-
-  public Graduate(GraduateDTO graduate) {
-    this.name = graduate.getName();
-    this.email = graduate.getEmail();
-    this.description = graduate.getDescription();
-    this.avatarUrl = graduate.getAvatarUrl();
-    this.linkedin = graduate.getLinkedin();
-    this.instagram = graduate.getInstagram();
-    this.curriculum = graduate.getCurriculum();
-  }
 }

@@ -1,4 +1,4 @@
-package com.gabrielcsilva1.Portal_Egresso.domain.specifications;
+package com.gabrielcsilva1.Portal_Egresso.domain.repositories.specifications;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.ObjectUtils;
