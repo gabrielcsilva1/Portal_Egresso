@@ -1,8 +1,10 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions;
 
-public class ResourceNotFoundException extends RuntimeException{
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.core.BadRequestException;
+
+public class ResourceNotFoundException extends BadRequestException{
   public ResourceNotFoundException() {
-    super("Bad request");
+    super();
   }
 
   public ResourceNotFoundException(String message) {

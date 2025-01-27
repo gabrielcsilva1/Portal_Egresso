@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CoordinatorDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorAlreadyExistsException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidCredentialsException;
 
 @Service
@@ -37,6 +38,13 @@ public class CoordinatorService{
 
   public Coordinator create(CoordinatorDTO coordinatorDTO) {
     Coordinator coordinator = coordinatorDTO.toEntity();
+
+    boolean coordinatorAlreadyExists = coordinatorRepository.findByLogin(coordinatorDTO.getLogin())
+      .isPresent();
+
+    if (coordinatorAlreadyExists) {
+      throw new CoordinatorAlreadyExistsException();
+    }
 
     String passwordHash = passwordEncoder.encode(coordinatorDTO.getPassword());
     coordinator.setPassword(passwordHash);

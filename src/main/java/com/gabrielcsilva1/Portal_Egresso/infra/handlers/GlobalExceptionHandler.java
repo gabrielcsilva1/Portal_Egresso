@@ -3,6 +3,7 @@ package com.gabrielcsilva1.Portal_Egresso.infra.handlers;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,14 +13,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CourseNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateAlreadyExistsException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateAlreadyTakenTheCourseException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateNotFoundException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidCredentialsException;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.ResourceNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.core.ConflictException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -39,36 +36,15 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
   }
 
-  @ExceptionHandler(ResourceNotFoundException.class)
-  public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException exception) {
-    Map<String, String> error = new HashMap<>();
-    error.put("error", exception.getMessage());
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-  }
-
-  @ExceptionHandler(CoordinatorNotFoundException.class)
-  public ResponseEntity<Map<String, String>> handleCoordinatorNotFoundException(CoordinatorNotFoundException exception) {
+  @ExceptionHandler(BadRequestException.class)
+  public ResponseEntity<Map<String, String>> handleBadRequestException(BadRequestException exception) {
     Map<String, String> error = new HashMap<>();
     error.put("error", "Bad request");
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }
 
-  @ExceptionHandler(CourseNotFoundException.class)
-  public ResponseEntity<Map<String, String>> handleCourseNotFoundException(CourseNotFoundException exception) {
-    Map<String, String> error = new HashMap<>();
-    error.put("error", "Bad request");
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-  }
-
-  @ExceptionHandler(GraduateNotFoundException.class)
-  public ResponseEntity<Map<String, String>> handleGraduateNotFoundException(GraduateNotFoundException exception) {
-    Map<String, String> error = new HashMap<>();
-    error.put("error", "Bad request");
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-  }
-
-  @ExceptionHandler(GraduateAlreadyExistsException.class)
-  public ResponseEntity<Map<String, String>> handleGraduateAlreadyExistsException(GraduateAlreadyExistsException exception) {
+  @ExceptionHandler(ConflictException.class)
+  public ResponseEntity<Map<String, String>> handleConflictException(ConflictException exception) {
     Map<String, String> error = new HashMap<>();
     error.put("error", exception.getMessage());
     return ResponseEntity.status(HttpStatus.CONFLICT).body(error);

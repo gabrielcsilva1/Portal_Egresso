@@ -1,5 +1,7 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions;
 
-public class GraduateNotFoundException extends RuntimeException {
+import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.core.BadRequestException;
+
+public class GraduateNotFoundException extends BadRequestException {
   public GraduateNotFoundException() { super("Egress not found"); }
 }
