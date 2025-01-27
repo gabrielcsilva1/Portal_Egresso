@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CoordinatorDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidCredentialsException;
@@ -32,5 +33,14 @@ public class CoordinatorService{
     String accessToken = tokenService.generateToken(coordinator.getId().toString());
 
     return accessToken;
+  }
+
+  public Coordinator create(CoordinatorDTO coordinatorDTO) {
+    Coordinator coordinator = coordinatorDTO.toEntity();
+
+    String passwordHash = passwordEncoder.encode(coordinatorDTO.getPassword());
+    coordinator.setPassword(passwordHash);
+
+    return coordinatorRepository.save(coordinator);
   }
 }
