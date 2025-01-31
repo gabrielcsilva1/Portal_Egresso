@@ -3,7 +3,7 @@
 Projeto da disciplina Laboratório de Programação (2024.2). O Portal de Egressos é um projeto que visa manter contato com os discentes que finalizaram o curso de Ciências da Computação, acompanhar no que estão atuando e fortalecer a comunidade.
 
 # Requisitos
-- [ ] Deve ser possível fazer o login como coordenador
+- [✔] Deve ser possível fazer o login como coordenador
 - [✔] Deve ser possível fazer o cadastro de egressos com:
     - Nome
     - Email

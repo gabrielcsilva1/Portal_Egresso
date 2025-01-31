@@ -28,7 +28,7 @@ public class CoordinatorController {
   @PostMapping("/session")
   @ApiResponse(responseCode = "200", description = "Login was successful")
   public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationDTO authenticationDTO) {
-    String token = this.coordinatorService.authenticate(
+    String token = this.coordinatorService.login(
       authenticationDTO.getLogin(),
       authenticationDTO.getPassword()
       );

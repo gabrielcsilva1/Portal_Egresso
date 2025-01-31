@@ -31,11 +31,11 @@ public class Graduate {
 
   @Builder.Default
   @OneToMany(mappedBy = "graduate")
-  private Set<GraduateCourse> graduateCourses = new HashSet<>();;
+  private Set<GraduateCourse> graduateCourses = new HashSet<>();
 
   @Builder.Default
   @OneToMany(mappedBy = "graduate")
-  private Set<Position> positions = new HashSet<>();;
+  private Set<Position> positions = new HashSet<>();
   
   @Column(nullable = false)
   private String name;

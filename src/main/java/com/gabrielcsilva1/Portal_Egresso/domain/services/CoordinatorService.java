@@ -21,7 +21,7 @@ public class CoordinatorService{
   @Autowired
   private TokenService tokenService;
 
-  public String authenticate(String login, String password) {
+  public String login(String login, String password) {
     Coordinator coordinator = this.coordinatorRepository.findByLogin(login)
       .orElseThrow(() -> new InvalidCredentialsException());
 
