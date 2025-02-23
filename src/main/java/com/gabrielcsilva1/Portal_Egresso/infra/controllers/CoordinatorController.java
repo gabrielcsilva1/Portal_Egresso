@@ -2,6 +2,7 @@ package com.gabrielcsilva1.Portal_Egresso.infra.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.services.CoordinatorService;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @RestController
@@ -27,15 +29,23 @@ public class CoordinatorController {
 
   @PostMapping("/session")
   @ApiResponse(responseCode = "200", description = "Login was successful")
-  public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationDTO authenticationDTO) {
+  public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationDTO authenticationDTO, HttpServletResponse response) {
     String token = this.coordinatorService.login(
       authenticationDTO.getLogin(),
       authenticationDTO.getPassword()
       );
+    
+    ResponseCookie cookie = ResponseCookie.from("jwtToken", token)
+      .httpOnly(true)
+      .secure(true)
+      .path("/")
+      .build();
+    
+    response.addHeader("Set-Cookie", cookie.toString());
 
-    AuthenticationResponse response = new AuthenticationResponse(token);
+    AuthenticationResponse authenticationResponse = new AuthenticationResponse(token);
 
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseEntity.status(HttpStatus.OK).body(authenticationResponse);
   }
 
   @PostMapping

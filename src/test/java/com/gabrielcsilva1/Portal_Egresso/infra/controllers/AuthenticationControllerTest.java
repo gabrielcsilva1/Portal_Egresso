@@ -1,6 +1,7 @@
 package com.gabrielcsilva1.Portal_Egresso.infra.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gabrielcsilva1.Portal_Egresso.domain.dtos.AuthenticationDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.authentication.AuthenticationResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
 
@@ -65,10 +65,9 @@ public class AuthenticationControllerTest {
 
     result.andExpect(MockMvcResultMatchers.status().isOk());
 
-    String responseJson = result.andReturn().getResponse().getContentAsString();
-    AuthenticationResponse loginResponse = objectMapper.readValue(responseJson, AuthenticationResponse.class);
-
-    assertThat(loginResponse).isNotNull();
-    assertThat(loginResponse.token()).isNotBlank();
+    String setCookieHeader  = result.andReturn().getResponse().getHeader("Set-Cookie");
+    assertThat(setCookieHeader).isNotNull();
+    assertTrue(setCookieHeader.contains("jwtToken="));
+    assertTrue(setCookieHeader.contains("HttpOnly"));
   }
 }

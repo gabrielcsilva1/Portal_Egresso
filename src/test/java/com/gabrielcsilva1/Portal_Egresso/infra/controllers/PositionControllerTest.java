@@ -30,6 +30,8 @@ import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.PositionRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TokenService;
 
+import jakarta.servlet.http.Cookie;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -60,6 +62,8 @@ public class PositionControllerTest {
 
   private Graduate graduate;
 
+  private Cookie cookie;
+
   @BeforeEach
   public void setup() {
     Coordinator coordinatorToSave = Coordinator.builder()
@@ -82,9 +86,14 @@ public class PositionControllerTest {
     graduateRepository.deleteAll();
   }
 
+  private void authenticateUser() {
+    String accessToken = tokenService.generateToken(coordinator.getId().toString());
+    cookie = new Cookie("jwtToken", accessToken);
+  }
+
   @Test
   public void register_graduate_position_controller_success() throws Exception{
-    String accessToken = tokenService.generateToken(coordinator.getId().toString());
+    authenticateUser();
 
     PositionDTO positionDTO = PositionDTO.builder()
       .graduateId(graduate.getId())
@@ -95,7 +104,7 @@ public class PositionControllerTest {
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.post("/graduate/position")
-      .header("Authorization", "Bearer " + accessToken)
+      .cookie(cookie)
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(positionDTO))
     );
@@ -109,7 +118,7 @@ public class PositionControllerTest {
 
   @Test
   public void update_graduate_position_success() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator.getId().toString());
+    authenticateUser();
 
     Position positionInDatabase = Position.builder()
       .graduate(graduate)
@@ -129,7 +138,7 @@ public class PositionControllerTest {
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.put("/graduate/position/{id}", positionInDatabase.getId())
-      .header("Authorization", "Bearer " + accessToken)
+      .cookie(cookie)
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(positionDTO))
     );
@@ -148,7 +157,7 @@ public class PositionControllerTest {
 
   @Test
   public void delete_graduate_position_success() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator.getId().toString());
+    authenticateUser();
 
     Position positionInDatabase = Position.builder()
       .graduate(graduate)
@@ -161,7 +170,7 @@ public class PositionControllerTest {
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.delete("/graduate/position/{id}", positionInDatabase.getId())
-      .header("Authorization", "Bearer " + accessToken)
+      .cookie(cookie)
     );
 
     // Test

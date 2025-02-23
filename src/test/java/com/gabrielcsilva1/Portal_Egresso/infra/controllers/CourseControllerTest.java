@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -35,6 +34,8 @@ import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateCourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TokenService;
+
+import jakarta.servlet.http.Cookie;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -67,7 +68,7 @@ public class CourseControllerTest {
 
   private Coordinator coordinator;
 
-  private String accessToken;
+  private Cookie cookie;
 
   @BeforeEach
   public void setup() {
@@ -77,6 +78,7 @@ public class CourseControllerTest {
       .build();
 
     this.coordinator = coordinatorRepository.save(coordinatorToSave);
+    this.cookie = new Cookie("jwtToken", tokenService.generateToken(coordinator.getId().toString()));
   }
 
   @AfterEach
@@ -86,15 +88,13 @@ public class CourseControllerTest {
 
   @Test
   public void create_course_controller_success() throws Exception {
-    accessToken = tokenService.generateToken(coordinator.getId().toString());
-
     CourseDTO courseDTO = new CourseDTO("Ciências da Computação", "Graduação");
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.post("/course")
-        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(courseDTO))
+        .cookie(cookie)
     );
 
     result.andExpect(MockMvcResultMatchers.status().isCreated());
@@ -140,8 +140,6 @@ public class CourseControllerTest {
 
   @Test
   public void register_graduate_in_course_controller_success() throws Exception {
-    accessToken = tokenService.generateToken(coordinator.getId().toString());
-
     Course courseInDatabase = Course.builder()
       .coordinator(coordinator)
       .name("Ciências da computação")
@@ -167,7 +165,7 @@ public class CourseControllerTest {
       MockMvcRequestBuilders.post("/course/graduate")
        .contentType(MediaType.APPLICATION_JSON)
        .content(objectMapper.writeValueAsString(graduateCourseDTO))
-       .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+       .cookie(cookie)
     );
 
     // Teste
@@ -182,8 +180,6 @@ public class CourseControllerTest {
 
   @Test
   public void unregister_graduate_in_course_controller_success() throws Exception {
-    accessToken = tokenService.generateToken(coordinator.getId().toString());
-
     Course courseInDatabase = Course.builder()
       .coordinator(coordinator)
       .name("Ciências da computação")
@@ -208,7 +204,7 @@ public class CourseControllerTest {
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.delete("/course/graduate/{id}", graduateCourseInDatabase.getId())
-       .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+       .cookie(cookie)
     );
 
     // Teste
@@ -221,8 +217,6 @@ public class CourseControllerTest {
 
   @Test
   public void update_course_controller_success() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator.getId().toString());
-
     UpdateCourseDTO courseDTO = UpdateCourseDTO.builder()
       .name("New name")
       .level("New level")
@@ -238,7 +232,7 @@ public class CourseControllerTest {
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.put("/course/{id}", courseInDatabase.getId())
-       .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+       .cookie(cookie)
        .contentType(MediaType.APPLICATION_JSON)
        .content(objectMapper.writeValueAsString(courseDTO))
     );
@@ -254,8 +248,6 @@ public class CourseControllerTest {
 
   @Test
   public void delete_course_controller_success() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator.getId().toString());
-    
     Course courseInDatabase = Course.builder()
       .coordinator(coordinator)
       .name("Ciências da computação")
@@ -266,7 +258,7 @@ public class CourseControllerTest {
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.delete("/course/{id}", courseInDatabase.getId())
-       .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+       .cookie(cookie)
     );
 
     // Test

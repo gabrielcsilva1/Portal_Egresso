@@ -35,6 +35,8 @@ import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.TestimonialRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TokenService;
 
+import jakarta.servlet.http.Cookie;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -66,6 +68,8 @@ public class TestimonialControllerTest {
 
   private Graduate graduate;
 
+  private Cookie cookie;
+
   @BeforeEach
   public void setup() {
     Coordinator coordinatorToSave = Coordinator.builder()
@@ -88,9 +92,14 @@ public class TestimonialControllerTest {
     graduateRepository.deleteAll();
   }
 
+  private void authenticateUser() {
+    String accessToken = tokenService.generateToken(coordinator.getId().toString());
+    cookie = new Cookie("jwtToken", accessToken);
+  }
+
   @Test
   public void register_graduate_testimonial() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator.getId().toString());
+    authenticateUser();
 
     TestimonialDTO testimonialDTO = TestimonialDTO.builder()
       .graduateId(graduate.getId())
@@ -99,7 +108,7 @@ public class TestimonialControllerTest {
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.post("/graduate/testimonial")
-      .header("Authorization", "Bearer " + accessToken)
+      .cookie(cookie)
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(testimonialDTO))
     );
@@ -145,7 +154,7 @@ public class TestimonialControllerTest {
 
   @Test
   public void update_graduate_testimonial() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator.getId().toString());
+    authenticateUser();
 
     Testimonial testimonialInDatabase = Testimonial.builder()
       .graduate(graduate)
@@ -161,7 +170,7 @@ public class TestimonialControllerTest {
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.put("/graduate/testimonial/{id}", testimonialInDatabase.getId())
-      .header("Authorization", "Bearer " + accessToken)
+      .cookie(cookie)
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(testimonialDTO))
     );
@@ -175,7 +184,7 @@ public class TestimonialControllerTest {
 
   @Test
   public void delete_graduate_testimonial() throws Exception {
-    String accessToken = tokenService.generateToken(coordinator.getId().toString());
+    authenticateUser();
 
     Testimonial testimonialInDatabase = Testimonial.builder()
       .graduate(graduate)
@@ -187,7 +196,7 @@ public class TestimonialControllerTest {
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.delete("/graduate/testimonial/{id}", testimonialInDatabase.getId())
-      .header("Authorization", "Bearer " + accessToken)
+      .cookie(cookie)
     );
 
     result.andExpect(MockMvcResultMatchers.status().isNoContent());

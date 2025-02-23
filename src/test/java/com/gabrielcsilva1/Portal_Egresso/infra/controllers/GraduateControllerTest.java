@@ -29,6 +29,8 @@ import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorReposito
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TokenService;
 
+import jakarta.servlet.http.Cookie;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -49,7 +51,9 @@ public class GraduateControllerTest {
   @Autowired
   private MockMvc mockMvc;
 
-  private String createCoordinatorAndAuthenticate() {
+  private Cookie cookie;
+
+  private void createCoordinatorAndAuthenticate() {
     var coordinator = Coordinator.builder()
      .login("admin")
      .password("password")
@@ -58,7 +62,7 @@ public class GraduateControllerTest {
     coordinator = coordinatorRepository.save(coordinator);
 
     String accessToken = tokenService.generateToken(coordinator.getId().toString());
-    return accessToken;
+    cookie = new Cookie("jwtToken", accessToken);
   }
 
 
@@ -97,7 +101,7 @@ public class GraduateControllerTest {
 
   @Test
   public void create_graduate_controller_success() throws Exception {
-    String accessToken = createCoordinatorAndAuthenticate();
+    createCoordinatorAndAuthenticate();
 
     GraduateDTO graduateDTO = GraduateDTO.builder()
       .name("John Doe")
@@ -106,7 +110,7 @@ public class GraduateControllerTest {
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.post("/graduate")
-       .header("Authorization", "Bearer " + accessToken)
+       .cookie(cookie)
        .contentType(MediaType.APPLICATION_JSON)
        .content(objectMapper.writeValueAsString(graduateDTO))
     );
@@ -147,7 +151,7 @@ public class GraduateControllerTest {
 
   @Test
   public void update_graduate_by_id_controller_success() throws Exception {
-    String accessToken = createCoordinatorAndAuthenticate();
+    createCoordinatorAndAuthenticate();
 
     UpdateGraduateDTO graduateDTO = UpdateGraduateDTO.builder()
       .name("Update")
@@ -171,7 +175,7 @@ public class GraduateControllerTest {
     var result = mockMvc.perform(
       MockMvcRequestBuilders.put("/graduate/{id}", graduateInDatabase.getId())
        .contentType(MediaType.APPLICATION_JSON)
-       .header("Authorization", "Bearer " + accessToken)
+       .cookie(cookie)
        .content(objectMapper.writeValueAsString(graduateDTO))
     );
 
@@ -191,7 +195,7 @@ public class GraduateControllerTest {
 
   @Test
   public void delete_graduate_by_id_controller_success() throws Exception {
-    String accessToken = createCoordinatorAndAuthenticate();
+    createCoordinatorAndAuthenticate();
 
     Graduate graduateInDatabase = Graduate.builder()
       .name("John Doe")
@@ -202,7 +206,7 @@ public class GraduateControllerTest {
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.delete("/graduate/{id}", graduateInDatabase.getId())
-      .header("Authorization", "Bearer " + accessToken)
+      .cookie(cookie)
     );
 
     // Teste

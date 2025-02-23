@@ -15,6 +15,7 @@ import com.gabrielcsilva1.Portal_Egresso.domain.services.TokenService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -48,13 +49,19 @@ public class SecurityFilter extends OncePerRequestFilter {
   }
 
   private String recoverToken(HttpServletRequest request) {
-    var authorizationHeader = request.getHeader("Authorization");
+    String token = null;
 
-    if (authorizationHeader == null) {
+    if (request.getCookies() == null) {
       return null;
     }
+    
+    for (Cookie cookie : request.getCookies()) {
+      if (cookie.getName().equals("jwtToken")) {
+        token = cookie.getValue();
+      }
+    }
 
-    return authorizationHeader.replace("Bearer ", "");
+    return token;
   }
   
 }
