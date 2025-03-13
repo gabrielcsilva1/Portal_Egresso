@@ -113,6 +113,7 @@ public class GraduateController {
     ResponseCookie cookie = ResponseCookie.from("jwtToken", responseJson.getToken())
       .httpOnly(true)
       .secure(true)
+      .sameSite("None")
       .path("/")
       .build();
     

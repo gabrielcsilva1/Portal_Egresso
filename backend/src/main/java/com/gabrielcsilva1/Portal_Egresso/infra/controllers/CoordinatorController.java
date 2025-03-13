@@ -38,6 +38,7 @@ public class CoordinatorController {
     ResponseCookie cookie = ResponseCookie.from("jwtToken", token)
       .httpOnly(true)
       .secure(true)
+      .sameSite("None")
       .path("/")
       .build();
     
