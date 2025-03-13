@@ -3,6 +3,7 @@ package com.gabrielcsilva1.Portal_Egresso.infra.configurations;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,6 +27,9 @@ import jakarta.servlet.http.HttpServletResponse;
 public class SecurityConfiguration {
   @Autowired
   SecurityFilter securityFilter;
+
+  @Value("${cors.allowed-origins}")
+  private String allowedOrigins;
   
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -66,7 +70,7 @@ public class SecurityConfiguration {
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
       CorsConfiguration configuration = new CorsConfiguration();
-      configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+      configuration.setAllowedOrigins(Arrays.asList(this.allowedOrigins));
       configuration.setAllowedMethods(Arrays.asList("*"));
       configuration.setAllowedHeaders(Arrays.asList("*"));
       configuration.setAllowCredentials(true);
