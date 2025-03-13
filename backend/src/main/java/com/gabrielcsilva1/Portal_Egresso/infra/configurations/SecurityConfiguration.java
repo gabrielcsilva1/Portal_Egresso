@@ -52,8 +52,16 @@ public class SecurityConfiguration {
       .logout(logout -> logout
         .logoutSuccessHandler((request, response, authentication) -> {
                 // Retorna um status HTTP 200 (OK) sem redirecionamento
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().flush();
+                ResponseCookie cookie = ResponseCookie.from("jwtToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(0) // Define expiração imediata
+                .build();
+    
+              response.addHeader("Set-Cookie", cookie.toString());
+              response.setStatus(HttpServletResponse.SC_OK);
             })
             .invalidateHttpSession(true)
             .deleteCookies("jwtToken")
