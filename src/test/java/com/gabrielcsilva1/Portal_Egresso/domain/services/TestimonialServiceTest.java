@@ -21,13 +21,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.TestimonialDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.TestimonialRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.dtos.enums.StatusEnum;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.testimonial.RequestCreateTestimonialJson;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.GraduateNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class TestimonialServiceTest {
@@ -43,15 +46,15 @@ public class TestimonialServiceTest {
   @Test
   @DisplayName("should be able to create a graduate testimonial.")
   public void register_graduate_testimonial_success() {
+    UUID graduateId = UUID.randomUUID();
     // DTO
-    var testimonialDTO = TestimonialDTO.builder()
-    .graduateId(UUID.randomUUID())
+    var testimonialDTO = RequestCreateTestimonialJson.builder()
     .text("testimonial test")
     .build();
 
     // Mocks
     var mockGraduate = Graduate.builder()
-      .id(testimonialDTO.getGraduateId())
+      .id(graduateId)
       .name("John Doe")
       .email("johndoe@example.com")
       .build();
@@ -63,36 +66,36 @@ public class TestimonialServiceTest {
       .createdAt(LocalDateTime.now())
       .build();
 
-    when(this.graduateRepository.findById(testimonialDTO.getGraduateId()))
+    when(this.graduateRepository.findById(any(UUID.class)))
       .thenReturn(Optional.of(mockGraduate));
     
     when(this.testimonialRepository.save(any(Testimonial.class)))
       .thenReturn(mockTestimonial);
 
     // Test
-    Testimonial result = sut.registerGraduateTestimonial(testimonialDTO);
+    Testimonial result = sut.registerGraduateTestimonial(graduateId, testimonialDTO);
 
     assertEquals(result.getId(), mockTestimonial.getId());
-    assertEquals(result.getGraduate().getId(), testimonialDTO.getGraduateId());
+    assertEquals(result.getGraduate().getId(), graduateId);
     assertEquals(result.getCreatedAt(), mockTestimonial.getCreatedAt());
   }
 
   @Test
   @DisplayName("should not be able to create a testimonial from a graduate that does not exist")
   public void register_graduate_testimonial_graduate_not_found() {
+    UUID graduateId = UUID.randomUUID();
     // DTO
-    var testimonialDTO = TestimonialDTO.builder()
-    .graduateId(UUID.randomUUID())
+    var testimonialDTO = RequestCreateTestimonialJson.builder()
     .text("testimonial test")
     .build();
 
     // Mocks
-    when(this.graduateRepository.findById(testimonialDTO.getGraduateId()))
+    when(this.graduateRepository.findById(any(UUID.class)))
       .thenReturn(Optional.empty());
 
     // Test
     assertThrows(GraduateNotFoundException.class, () -> {
-      sut.registerGraduateTestimonial(testimonialDTO);
+      sut.registerGraduateTestimonial(graduateId, testimonialDTO);
     });
   }
 
@@ -100,7 +103,7 @@ public class TestimonialServiceTest {
   @DisplayName("should be able to fetch all recent testimonials")
   public void fetch_testimonials_order_by_created_at_desc() {
     // Mocks
-    PageRequest pageRequest = PageRequest.of(0, 10);
+    PageRequest pageRequest = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
     Graduate graduateMock = Graduate.builder()
       .id(UUID.randomUUID())
@@ -117,12 +120,12 @@ public class TestimonialServiceTest {
 
     Page<Testimonial> mockPageTestimonial = new PageImpl<Testimonial>(testimonialsMock);
 
-    when(this.testimonialRepository.findAllByOrderByCreatedAtDesc(pageRequest))
+    when(this.testimonialRepository.findByRegistrationStatus(StatusEnum.ACCEPTED, pageRequest))
       .thenReturn(mockPageTestimonial);
 
     // Test
 
-    Page<Testimonial> result = sut.fetchTestimonials(null, 0, 10);
+    Page<Testimonial> result = sut.fetchTestimonials(null, 0);
     
     assertNotNull(result);
     assertThat(result.getContent()).hasSize(1);
@@ -132,7 +135,7 @@ public class TestimonialServiceTest {
   @DisplayName("should be able to fetch testimonials by year")
   public void fetch_testimonials_by_year() {
     // Mocks
-    PageRequest pageRequest = PageRequest.of(0, 10);
+    PageRequest pageRequest = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "createdAt"));
 
     Graduate graduateMock = Graduate.builder()
       .id(UUID.randomUUID())
@@ -155,7 +158,7 @@ public class TestimonialServiceTest {
 
     // Test
 
-    Page<Testimonial> result = sut.fetchTestimonials(2022, 0, 10);
+    Page<Testimonial> result = sut.fetchTestimonials(2022, 0);
     
     assertNotNull(result);
     assertThat(result.getContent()).hasSize(1);

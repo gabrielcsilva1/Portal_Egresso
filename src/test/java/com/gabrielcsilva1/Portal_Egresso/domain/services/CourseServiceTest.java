@@ -15,9 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateCourseDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.UpdateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
@@ -26,16 +23,20 @@ import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorReposito
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateCourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CourseNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateAlreadyTakenTheCourseException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.course.RequestCreateCourseJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.course.RequestUpdateCourseJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.graduateCourse.RequestGraduateCourseJson;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.CoordinatorNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.CourseNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.GraduateAlreadyTakenTheCourseException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.GraduateNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.InvalidEndYearException;
+import com.gabrielcsilva1.utils.faker.FakeCourseFactory;
 
 @ExtendWith(MockitoExtension.class)
 public class CourseServiceTest {
   @InjectMocks
-  private CourseService sut;
+  private CourseService courseService;
 
   @Mock
   private CourseRepository courseRepository;
@@ -53,7 +54,7 @@ public class CourseServiceTest {
   @DisplayName("should be able to create a new course")
   public void create_course_success() {
     // DTO
-    var courseDTO = CourseDTO.builder()
+    var courseDTO = RequestCreateCourseJson.builder()
       .name("Course Name")
       .level("Graduation")
       .build();
@@ -65,11 +66,7 @@ public class CourseServiceTest {
       .id(coordinatorId)
       .build();
     
-    var courseMock = Course.builder()
-      .coordinator(coordinatorMock)
-      .name(courseDTO.getName())
-      .level(courseDTO.getLevel())
-      .build();
+    var courseMock = FakeCourseFactory.makeCourse(coordinatorMock);
 
     when(this.coordinatorRepository.findById(coordinatorMock.getId()))
       .thenReturn(Optional.of(coordinatorMock));
@@ -78,7 +75,7 @@ public class CourseServiceTest {
       .thenReturn(courseMock);
 
     // Test
-    Course result = this.sut.createCourse(courseDTO, coordinatorId);
+    Course result = this.courseService.createCourse(courseDTO, coordinatorId);
 
     assertEquals(result.getId(), courseMock.getId());
     assertEquals(result.getCoordinator().getId(), coordinatorId);
@@ -88,7 +85,7 @@ public class CourseServiceTest {
   @DisplayName("should not be able to create a new course with a coordinator identifier not valid")
   public void create_course_coordinator_not_found_exception() {
      // DTO
-     var courseDTO = CourseDTO.builder()
+     var courseDTO = RequestCreateCourseJson.builder()
      .name("Course Name")
      .level("Graduation")
      .build();
@@ -102,17 +99,18 @@ public class CourseServiceTest {
 
    // Test
    assertThrows(CoordinatorNotFoundException.class, () -> {
-      this.sut.createCourse(courseDTO, coordinatorId);
+      this.courseService.createCourse(courseDTO, coordinatorId);
    });
   }
 
   @Test
   @DisplayName("should be able to register a graduate in a course")
   public void register_graduate_in_course_success() {
+    UUID graduateId = UUID.randomUUID();
     // DTO
-    var graduateCourseDTO = GraduateCourseDTO.builder()
-      .graduateId(UUID.randomUUID())
+    var graduateCourseDTO = RequestGraduateCourseJson.builder()
       .courseId(UUID.randomUUID())
+      .graduateId(graduateId)
       .startYear(Integer.valueOf(2000))
       .endYear(Integer.valueOf(2020))
       .build();
@@ -123,7 +121,7 @@ public class CourseServiceTest {
       .build();
 
     Graduate graduateMock = Graduate.builder()
-      .id(graduateCourseDTO.getGraduateId())
+      .id(graduateId)
       .build();
 
     GraduateCourse graduateCourseMock = GraduateCourse.builder()
@@ -137,24 +135,24 @@ public class CourseServiceTest {
     // Mock behavior
     when(courseRepository.findById(graduateCourseDTO.getCourseId()))
       .thenReturn(Optional.of(courseMock));
-    when(graduateRepository.findById(graduateCourseDTO.getGraduateId()))
+    when(graduateRepository.findById(graduateId))
       .thenReturn(Optional.of(graduateMock));
     when(graduateCourseRepository.save(any(GraduateCourse.class)))
       .thenReturn(graduateCourseMock);
 
     // Test
-    GraduateCourse result = sut.registerGraduateInCourse(graduateCourseDTO);
+    GraduateCourse result = courseService.registerGraduateInCourse( graduateCourseDTO);
 
     assertEquals(result.getId(), graduateCourseMock.getId());
     assertEquals(result.getCourse().getId(), graduateCourseDTO.getCourseId());
-    assertEquals(result.getGraduate().getId(), graduateCourseDTO.getGraduateId());
+    assertEquals(result.getGraduate().getId(), graduateId);
   }
 
   @Test
   @DisplayName("should not be able to register a invalid graduate in a course")
   public void register_graduate_in_course_graduate_not_found() {
     // DTO
-    var graduateCourseDTO = GraduateCourseDTO.builder()
+    var graduateCourseDTO = RequestGraduateCourseJson.builder()
       .graduateId(UUID.randomUUID())
       .courseId(UUID.randomUUID())
       .startYear(Integer.valueOf(2000))
@@ -162,12 +160,12 @@ public class CourseServiceTest {
       .build();
 
     // Mock behavior
-    when(graduateRepository.findById(graduateCourseDTO.getGraduateId()))
+    when(graduateRepository.findById(any(UUID.class)))
       .thenReturn(Optional.empty());
 
     // Test
     assertThrows(GraduateNotFoundException.class, () -> {
-      sut.registerGraduateInCourse(graduateCourseDTO) ;
+      courseService.registerGraduateInCourse( graduateCourseDTO) ;
     });
   }
 
@@ -175,7 +173,7 @@ public class CourseServiceTest {
   @DisplayName("should not be able to register a graduate in a invalid course")
   public void register_graduate_in_course_course_not_found() {
     // DTO
-    var graduateCourseDTO = GraduateCourseDTO.builder()
+    var graduateCourseDTO = RequestGraduateCourseJson.builder()
       .graduateId(UUID.randomUUID())
       .courseId(UUID.randomUUID())
       .startYear(Integer.valueOf(2000))
@@ -184,60 +182,62 @@ public class CourseServiceTest {
 
     // Mocks
     Graduate graduateMock = Graduate.builder()
-      .id(graduateCourseDTO.getGraduateId())
+      .id(UUID.randomUUID())
       .build();
 
     // Mock behavior
-    when(graduateRepository.findById(graduateCourseDTO.getGraduateId()))
+    when(graduateRepository.findById(any(UUID.class)))
       .thenReturn(Optional.of(graduateMock));
-    when(courseRepository.findById(graduateCourseDTO.getCourseId()))
+    when(courseRepository.findById(any(UUID.class)))
       .thenReturn(Optional.empty());
 
     // Test
     assertThrows(CourseNotFoundException.class, () -> {
-      sut.registerGraduateInCourse(graduateCourseDTO);
+      courseService.registerGraduateInCourse(graduateCourseDTO);
     });
   }
 
   @Test
   @DisplayName("should not be able to register an graduate in the course with an end year before the start year")
   public void register_graduate_in_course_invalid_end_year() {
+    UUID graduateId = UUID.randomUUID();
     // DTO
-    var graduateCourseDTO = GraduateCourseDTO.builder()
-      .graduateId(UUID.randomUUID())
+    var graduateCourseDTO = RequestGraduateCourseJson.builder()
       .courseId(UUID.randomUUID())
+      .graduateId(graduateId)
       .startYear(Integer.valueOf(2000))
       .endYear(Integer.valueOf(1990))
       .build();
 
     // Mocks
     Course courseMock = Course.builder()
-      .id(graduateCourseDTO.getCourseId())
+      .id(graduateId)
       .build();
 
     Graduate graduateMock = Graduate.builder()
-      .id(graduateCourseDTO.getGraduateId())
+      .id(graduateId)
       .build();
 
     // Mock behavior
     when(courseRepository.findById(graduateCourseDTO.getCourseId()))
       .thenReturn(Optional.of(courseMock));
-    when(graduateRepository.findById(graduateCourseDTO.getGraduateId()))
+    when(graduateRepository.findById(graduateId))
       .thenReturn(Optional.of(graduateMock));
 
     // Test
     assertThrows(InvalidEndYearException.class, () -> {
-      sut.registerGraduateInCourse(graduateCourseDTO);
+      courseService.registerGraduateInCourse( graduateCourseDTO);
     });
   }
 
   @Test
   @DisplayName("should not be able to register an graduate twice in the same course")
   public void register_graduate_in_course_graduate_already_taken_the_course() {
+    UUID graduateId = UUID.randomUUID();
     // DTO
-    var graduateCourseDTO = GraduateCourseDTO.builder()
-      .graduateId(UUID.randomUUID())
+    var graduateCourseDTO = RequestGraduateCourseJson.builder()
       .courseId(UUID.randomUUID())
+      .graduateId(graduateId)
       .startYear(Integer.valueOf(2000))
       .endYear(Integer.valueOf(2020))
       .build();
@@ -248,7 +248,7 @@ public class CourseServiceTest {
       .build();
 
     Graduate graduateMock = Graduate.builder()
-      .id(graduateCourseDTO.getGraduateId())
+      .id(graduateId)
       .build();
 
     GraduateCourse graduateCourseMock = new GraduateCourse();
@@ -256,21 +256,21 @@ public class CourseServiceTest {
     // Mock behavior
     when(courseRepository.findById(graduateCourseDTO.getCourseId()))
       .thenReturn(Optional.of(courseMock));
-    when(graduateRepository.findById(graduateCourseDTO.getGraduateId()))
+    when(graduateRepository.findById(graduateId))
       .thenReturn(Optional.of(graduateMock));
     when(graduateCourseRepository.findByGraduateAndCourse(graduateMock, courseMock))
       .thenReturn(Optional.of(graduateCourseMock));
 
     // Test
     assertThrows(GraduateAlreadyTakenTheCourseException.class, () -> {
-      sut.registerGraduateInCourse(graduateCourseDTO);
+      courseService.registerGraduateInCourse( graduateCourseDTO);
     });
   }
 
   @Test
   @DisplayName("should be able to update a course")
   public void update_course_success() {
-    UpdateCourseDTO courseDTO = UpdateCourseDTO.builder()
+    RequestUpdateCourseJson courseDTO = RequestUpdateCourseJson.builder()
       .name("Ciências da computação")
       .level("Pós-graduação")
       .build();
@@ -287,7 +287,7 @@ public class CourseServiceTest {
     when(courseRepository.save(any(Course.class)))
       .thenAnswer(invocation -> invocation.getArgument(0));
 
-    Course result = sut.updateCourse(courseMock.getId(), courseDTO);
+    Course result = courseService.updateCourse(courseMock.getId(), courseDTO);
 
     assertEquals(result.getName(), courseMock.getName());
     assertEquals(result.getLevel(), courseDTO.getLevel());
@@ -296,7 +296,7 @@ public class CourseServiceTest {
   @Test
   @DisplayName("should not be able to update a course with wrong id")
   public void update_course_with_invalid_course_id() {
-    UpdateCourseDTO courseDTO = UpdateCourseDTO.builder()
+    RequestUpdateCourseJson courseDTO = RequestUpdateCourseJson.builder()
       .name("Ciências da computação")
       .level("Pós-graduação")
       .build();
@@ -304,6 +304,6 @@ public class CourseServiceTest {
     when(courseRepository.findById(any(UUID.class)))
       .thenReturn(Optional.empty());
 
-    assertThrows(CourseNotFoundException.class, () -> sut.updateCourse(UUID.randomUUID(), courseDTO));
+    assertThrows(CourseNotFoundException.class, () -> courseService.updateCourse(UUID.randomUUID(), courseDTO));
   }
 }

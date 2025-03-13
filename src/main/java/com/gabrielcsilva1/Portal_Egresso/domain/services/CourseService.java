@@ -6,21 +6,21 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateCourseDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.UpdateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.GraduateCourse;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateCourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.ResourceNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CourseNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateAlreadyTakenTheCourseException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateNotFoundException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.course.RequestCreateCourseJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.course.RequestUpdateCourseJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.graduateCourse.RequestGraduateCourseJson;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.CoordinatorNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.CourseNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.GraduateAlreadyTakenTheCourseException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.GraduateNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.InvalidEndYearException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.core.BadRequestException;
 
 @Service
 public class CourseService {
@@ -36,18 +36,12 @@ public class CourseService {
   @Autowired
   private GraduateCourseRepository graduateCourseRepository;
 
-  public Course createCourse(CourseDTO courseDTO, UUID coordinatorId) {
-    var coordinator = this.coordinatorRepository.findById(coordinatorId);
+  public Course createCourse(RequestCreateCourseJson courseDTO, UUID coordinatorId) {
+    var coordinator = this.coordinatorRepository.findById(coordinatorId)
+      .orElseThrow(() -> new CoordinatorNotFoundException());
 
-    if (coordinator.isEmpty()) {
-      throw new CoordinatorNotFoundException();
-    }
-
-    var course = Course.builder()
-      .coordinator(coordinator.get())
-      .name(courseDTO.getName())
-      .level(courseDTO.getLevel())
-      .build();
+    var course = courseDTO.toDomain();
+    course.setCoordinator(coordinator);
 
     return this.courseRepository.save(course);
   }
@@ -56,25 +50,19 @@ public class CourseService {
     return this.courseRepository.findAllByOrderByNameAsc();
   }
 
-  public GraduateCourse registerGraduateInCourse(GraduateCourseDTO graduateCourseDTO) {
-    var graduate = this.graduateRepository.findById(graduateCourseDTO.getGraduateId());
+  public GraduateCourse registerGraduateInCourse(RequestGraduateCourseJson graduateCourseDTO) {
+    var graduate = this.graduateRepository.findById(graduateCourseDTO.getGraduateId())
+      .orElseThrow(() -> new GraduateNotFoundException());
 
-    if (graduate.isEmpty()) {
-      throw new GraduateNotFoundException();
-    }
-
-    var course = this.courseRepository.findById(graduateCourseDTO.getCourseId());
-
-    if (course.isEmpty()) {
-      throw new CourseNotFoundException();
-    }
+    var course = this.courseRepository.findById(graduateCourseDTO.getCourseId())
+      .orElseThrow(() -> new CourseNotFoundException());
 
     boolean graduateAlreadyTakenTheCourse = this.graduateCourseRepository
-      .findByGraduateAndCourse(graduate.get(), course.get())
+      .findByGraduateAndCourse(graduate, course)
       .isPresent();
 
     if (graduateAlreadyTakenTheCourse) {
-      throw new GraduateAlreadyTakenTheCourseException(course.get().getName());
+      throw new GraduateAlreadyTakenTheCourseException();
     }
     
     boolean isStartYearGreaterThanEndYear = false;
@@ -88,8 +76,8 @@ public class CourseService {
     }
 
     var graduateCourse = GraduateCourse.builder()
-      .course(course.get())
-      .graduate(graduate.get())
+      .course(course)
+      .graduate(graduate)
       .startYear(graduateCourseDTO.getStartYear())
       .endYear(graduateCourseDTO.getEndYear())
       .build();
@@ -97,14 +85,20 @@ public class CourseService {
     return this.graduateCourseRepository.save(graduateCourse);
   }
 
-  public void unregisterGraduateInCourse(UUID id) {
-    GraduateCourse graduateCourse = graduateCourseRepository.findById(id)
-      .orElseThrow(() -> new ResourceNotFoundException());
+  public void unregisterGraduateInCourse(UUID graduateId, UUID courseId) {
+    var graduate = this.graduateRepository.findById(graduateId)
+      .orElseThrow(() -> new GraduateNotFoundException());
+
+    var course = this.courseRepository.findById(courseId)
+      .orElseThrow(() -> new CourseNotFoundException());
+
+    GraduateCourse graduateCourse = this.graduateCourseRepository.findByGraduateAndCourse(graduate, course)
+      .orElseThrow(() -> new BadRequestException());
 
     graduateCourseRepository.delete(graduateCourse);
   }
 
-  public Course updateCourse(UUID id, UpdateCourseDTO courseDTO) {
+  public Course updateCourse(UUID id, RequestUpdateCourseJson courseDTO) {
     Course course = this.courseRepository.findById(id)
       .orElseThrow(() -> new CourseNotFoundException());
 

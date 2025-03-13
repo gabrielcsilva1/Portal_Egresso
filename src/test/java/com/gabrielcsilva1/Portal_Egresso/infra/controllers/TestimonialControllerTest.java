@@ -1,7 +1,5 @@
 package com.gabrielcsilva1.Portal_Egresso.infra.controllers;
 
-
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -23,17 +20,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.TestimonialDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.paginated.PaginatedResponse;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.testimonial.TestimonialResponse;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.testimonial.UpdateTestimonialDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.IGenericUser;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
-import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.TestimonialRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TokenService;
+import com.gabrielcsilva1.Portal_Egresso.dtos.paginated.ResponsePaginated;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.testimonial.RequestCreateTestimonialJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.testimonial.RequestUpdateTestimonialJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.response.testimonial.ResponseTestimonialJson;
+import com.gabrielcsilva1.utils.faker.FakeGraduateFactory;
+import com.gabrielcsilva1.utils.faker.FakeTestimonial;
 
 import jakarta.servlet.http.Cookie;
 
@@ -53,61 +51,43 @@ public class TestimonialControllerTest {
   private TokenService tokenService;
 
   @Autowired
-  private CoordinatorRepository coordinatorRepository;
-
-  @Autowired
   private GraduateRepository graduateRepository;
 
   @Autowired
   private TestimonialRepository testimonialRepository;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
-
-  private Coordinator coordinator;
 
   private Graduate graduate;
 
-  private Cookie cookie;
-
   @BeforeEach
   public void setup() {
-    Coordinator coordinatorToSave = Coordinator.builder()
-      .login("admin")
-      .password(passwordEncoder.encode("admin"))
-      .build();
-
-    Graduate graduateToSave = Graduate.builder()
-      .name("John Doe")
-      .email("john.doe@example.com")
-      .build();
-
-    this.coordinator = coordinatorRepository.save(coordinatorToSave);
-    this.graduate = graduateRepository.save(graduateToSave);
+    Graduate graduateInDatabase = FakeGraduateFactory.makeGraduate();
+    this.graduate = graduateRepository.save(graduateInDatabase);
   }
 
   @AfterEach
   public void clean() {
-    coordinatorRepository.deleteAll();
     graduateRepository.deleteAll();
   }
 
-  private void authenticateUser() {
-    String accessToken = tokenService.generateToken(coordinator.getId().toString());
-    cookie = new Cookie("jwtToken", accessToken);
+  private Cookie authenticateUser(String subject, IGenericUser user) {
+    String accessToken = tokenService.generateToken(subject, user.getRoles());
+    return  new Cookie("jwtToken", accessToken);
   }
 
   @Test
   public void register_graduate_testimonial() throws Exception {
-    authenticateUser();
+    Cookie cookie = authenticateUser(
+      graduate.getId().toString(),
+      graduate
+    );
 
-    TestimonialDTO testimonialDTO = TestimonialDTO.builder()
-      .graduateId(graduate.getId())
+    RequestCreateTestimonialJson testimonialDTO = RequestCreateTestimonialJson.builder()
       .text("Testimonial")
       .build();
 
     var result = mockMvc.perform(
-      MockMvcRequestBuilders.post("/graduate/testimonial")
+      MockMvcRequestBuilders.post("/testimonial")
       .cookie(cookie)
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(testimonialDTO))
@@ -122,29 +102,21 @@ public class TestimonialControllerTest {
 
   @Test
   public void fetch_graduate_testimonials() throws Exception {
-    Testimonial testimonialInDatabase1 = Testimonial.builder()
-      .graduate(graduate)
-      .text("Testimonial 1")
-      .createdAt(LocalDateTime.now())
-      .build();
+    Testimonial testimonialInDatabase1 = FakeTestimonial.makeTestimonial(graduate);
 
-    Testimonial testimonialInDatabase2 = Testimonial.builder()
-      .graduate(graduate)
-      .text("Testimonial 2")
-      .createdAt(LocalDateTime.now())
-      .build();
+    Testimonial testimonialInDatabase2 = FakeTestimonial.makeTestimonial(graduate);
     
     testimonialInDatabase1 = testimonialRepository.save(testimonialInDatabase1);
     testimonialInDatabase2 = testimonialRepository.save(testimonialInDatabase2);
 
     var result = mockMvc.perform(
-      MockMvcRequestBuilders.get("/graduate/testimonial")
+      MockMvcRequestBuilders.get("/testimonial")
     );
 
     String jsonResponse = result.andReturn().getResponse().getContentAsString();
-    PaginatedResponse<TestimonialResponse> fetchTestimonialsResponse = objectMapper.readValue(
+    ResponsePaginated<ResponseTestimonialJson> fetchTestimonialsResponse = objectMapper.readValue(
       jsonResponse,
-      new TypeReference<PaginatedResponse<TestimonialResponse>>(){}
+      new TypeReference<ResponsePaginated<ResponseTestimonialJson>>(){}
     );
 
     assertThat(fetchTestimonialsResponse.getContent()).isNotNull();
@@ -154,22 +126,21 @@ public class TestimonialControllerTest {
 
   @Test
   public void update_graduate_testimonial() throws Exception {
-    authenticateUser();
+    Cookie cookie = authenticateUser(
+      graduate.getId().toString(),
+      graduate
+    );
 
-    Testimonial testimonialInDatabase = Testimonial.builder()
-      .graduate(graduate)
-      .text("Testimonial")
-      .createdAt(LocalDateTime.now())
-      .build();
+    Testimonial testimonialInDatabase = FakeTestimonial.makeTestimonial(graduate);
     
     testimonialInDatabase = testimonialRepository.save(testimonialInDatabase);
 
-    UpdateTestimonialDTO testimonialDTO = UpdateTestimonialDTO.builder()
+    RequestUpdateTestimonialJson testimonialDTO = RequestUpdateTestimonialJson.builder()
       .text("New text")
       .build();
 
     var result = mockMvc.perform(
-      MockMvcRequestBuilders.put("/graduate/testimonial/{id}", testimonialInDatabase.getId())
+      MockMvcRequestBuilders.put("/testimonial/{id}", testimonialInDatabase.getId())
       .cookie(cookie)
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(testimonialDTO))
@@ -184,18 +155,17 @@ public class TestimonialControllerTest {
 
   @Test
   public void delete_graduate_testimonial() throws Exception {
-    authenticateUser();
+    Cookie cookie = authenticateUser(
+      graduate.getId().toString(),
+      graduate
+    );
 
-    Testimonial testimonialInDatabase = Testimonial.builder()
-      .graduate(graduate)
-      .text("Testimonial")
-      .createdAt(LocalDateTime.now())
-      .build();
+    Testimonial testimonialInDatabase = FakeTestimonial.makeTestimonial(graduate);
     
     testimonialInDatabase = testimonialRepository.save(testimonialInDatabase);
 
     var result = mockMvc.perform(
-      MockMvcRequestBuilders.delete("/graduate/testimonial/{id}", testimonialInDatabase.getId())
+      MockMvcRequestBuilders.delete("/testimonial/{id}", testimonialInDatabase.getId())
       .cookie(cookie)
     );
 

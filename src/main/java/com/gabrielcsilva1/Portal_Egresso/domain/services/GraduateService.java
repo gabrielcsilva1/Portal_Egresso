@@ -1,5 +1,6 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.services;
 
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,14 +8,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.UpdateGraduateDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateAlreadyExistsException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.dtos.enums.StatusEnum;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.graduate.RequestCreateGraduateJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.graduate.RequestUpdateGraduateJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.graduateCourse.RequestGraduateCourseJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.response.authentication.ResponseGraduateAuthenticationJson;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.GraduateAlreadyExistsException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.GraduateNotFoundException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.InvalidCredentialsException;
+
+import jakarta.transaction.Transactional;
 
 
 @Service
@@ -22,7 +30,17 @@ public class GraduateService {
   @Autowired
   private GraduateRepository graduateRepository;
 
-  public Graduate createGraduate(GraduateDTO graduateDTO) {
+  @Autowired
+  private CourseService courseService;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
+  @Autowired
+  private TokenService tokenService;
+
+  @Transactional
+  public Graduate createGraduate(RequestCreateGraduateJson graduateDTO) {
     var graduateWithSameEmail = this.graduateRepository.findByEmail(graduateDTO.getEmail());
 
     if (graduateWithSameEmail.isPresent()) {
@@ -31,7 +49,46 @@ public class GraduateService {
 
     Graduate graduate = graduateDTO.toEntity();
 
-    return this.graduateRepository.save(graduate);
+    String passwordHash = this.passwordEncoder.encode(graduate.getPassword());
+
+    graduate.setPassword(passwordHash);
+
+    graduate = this.graduateRepository.save(graduate);
+
+    var graduateCourseDTO = RequestGraduateCourseJson.builder()
+      .graduateId(graduate.getId())
+      .courseId(graduateDTO.getCourseId())
+      .startYear(graduateDTO.getStartYear())
+      .endYear(graduateDTO.getEndYear())
+      .build();
+
+    var graduateCourse = courseService.registerGraduateInCourse(graduateCourseDTO);
+
+    graduate.setGraduateCourses(Set.of(graduateCourse));
+
+    return graduate;
+  }
+  
+  public ResponseGraduateAuthenticationJson login(String email, String password) {
+    Graduate graduate = this.graduateRepository.findByEmail(email)
+      .orElseThrow(() -> new InvalidCredentialsException());
+
+    boolean isPasswordValid = passwordEncoder.matches(password, graduate.getPassword());
+
+    if (!isPasswordValid) {
+      throw new InvalidCredentialsException();
+    }
+
+    String accessToken = "";
+
+    if (graduate.getRegistrationStatus().equals(StatusEnum.ACCEPTED)) {
+      accessToken = tokenService.generateToken(graduate.getId().toString(), graduate.getRoles());
+    }
+    else if (graduate.getRegistrationStatus().equals(StatusEnum.REJECTED)) {
+      graduateRepository.delete(graduate);
+    }
+
+    return ResponseGraduateAuthenticationJson.toResponse(accessToken, graduate);
   }
 
   public Graduate getGraduateById(UUID id) {
@@ -41,17 +98,27 @@ public class GraduateService {
     return graduate;
   }
 
-  public Page<Graduate> fetchGraduates(Specification<Graduate> queryFilters, Integer page) {
-    if (page < 0) {
-      page = 0;
+  public Page<Graduate> fetchVerifiedGraduates(Specification<Graduate> queryFilters, Integer pageIndex) {
+    if (pageIndex < 0) {
+      pageIndex = 0;
     }
     
-    Pageable pageable = PageRequest.of(page, 20);
+    Pageable pageable = PageRequest.of(pageIndex, 5);
 
     return this.graduateRepository.findAll(queryFilters, pageable);
   }
 
-  public Graduate updateGraduate(UUID id, UpdateGraduateDTO graduateDTO) {
+  public Page<Graduate> fetchUnverifiedGraduates(int pageIndex) {
+    if (pageIndex < 0) {
+      pageIndex = 0;
+    }
+    
+    Pageable pageable = PageRequest.of(pageIndex, 5);
+
+    return this.graduateRepository.findByRegistrationStatus(StatusEnum.PENDING, pageable);
+  }
+
+  public Graduate updateGraduate(UUID id, RequestUpdateGraduateJson graduateDTO) {
     var graduate = this.graduateRepository.findById(id)
       .orElseThrow( () -> new GraduateNotFoundException());
 
@@ -62,6 +129,15 @@ public class GraduateService {
     graduate.setLinkedin(graduateDTO.getLinkedin());
     graduate.setInstagram(graduateDTO.getInstagram());
     graduate.setCurriculum(graduateDTO.getCurriculum());
+
+    return this.graduateRepository.save(graduate);
+  }
+
+  public Graduate updateGraduateRegisterStatus(UUID id, StatusEnum newStatus) {
+    var graduate = this.graduateRepository.findById(id)
+      .orElseThrow( () -> new GraduateNotFoundException());
+
+    graduate.setRegistrationStatus(newStatus);
 
     return this.graduateRepository.save(graduate);
   }

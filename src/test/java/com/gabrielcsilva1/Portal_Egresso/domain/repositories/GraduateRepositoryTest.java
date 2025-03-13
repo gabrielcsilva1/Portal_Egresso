@@ -18,7 +18,8 @@ import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.GraduateCourse;
-import com.gabrielcsilva1.Portal_Egresso.infra.queryfilters.GraduateQueryFilter;
+import com.gabrielcsilva1.Portal_Egresso.dtos.enums.StatusEnum;
+import com.gabrielcsilva1.Portal_Egresso.dtos.queryParams.QueryGraduate;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -42,6 +43,7 @@ public class GraduateRepositoryTest {
     Graduate graduate = Graduate.builder()
       .name("john doe")
       .email("johndoe@example.com")
+      .password("123456")
       .build();
 
     Graduate result = this.graduateRepository.save(graduate);
@@ -57,6 +59,7 @@ public class GraduateRepositoryTest {
     Graduate graduate = Graduate.builder()
       .name("john doe")
       .email("johndoe@example.com")
+      .password("123456")
       .build();
 
     Graduate savedGraduate = this.graduateRepository.save(graduate);
@@ -68,15 +71,17 @@ public class GraduateRepositoryTest {
 
   @Test
   @DisplayName("should be able to fetch user with filter (query)")
-  public void fetch_graduatees_with_query_filter_success() {
+  public void fetch_graduates_with_query_filter_success() {
     Graduate graduate = Graduate.builder()
       .name("john doe")
       .email("johndoe@example.com")
+      .password("123456")
+      .registrationStatus(StatusEnum.ACCEPTED)
       .build();
 
     graduate = graduateRepository.save(graduate);
 
-    var queryFilter = GraduateQueryFilter.builder()
+    var queryFilter = QueryGraduate.builder()
       .query(graduate.getName())
       .build();
 
@@ -87,10 +92,12 @@ public class GraduateRepositoryTest {
 
   @Test
   @DisplayName("should be able to fetch user with filters (query, year and courseName)")
-  public void fetch_graduatees_with_filters_success() {
+  public void fetch_graduates_with_filters_success() {
     Graduate graduate = Graduate.builder()
       .name("john doe")
       .email("johndoe@example.com")
+      .password("123456")
+      .registrationStatus(StatusEnum.ACCEPTED)
       .build();
 
     graduate = graduateRepository.save(graduate);
@@ -118,7 +125,7 @@ public class GraduateRepositoryTest {
 
     graduateCourseRepository.save(graduateCourse);
 
-    var queryFilter = GraduateQueryFilter.builder()
+    var queryFilter = QueryGraduate.builder()
       .courseName(course.getName())
       .query(graduate.getName())
       .year(graduateCourse.getStartYear())

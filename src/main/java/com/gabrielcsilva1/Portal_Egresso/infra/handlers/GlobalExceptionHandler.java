@@ -3,9 +3,9 @@ package com.gabrielcsilva1.Portal_Egresso.infra.handlers;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.FieldError;
@@ -13,10 +13,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.GraduateAlreadyTakenTheCourseException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidCredentialsException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidEndYearException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.core.ConflictException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.GraduateAlreadyTakenTheCourseException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.InvalidCredentialsException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.InvalidEndYearException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.core.BadRequestException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.core.ConflictException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -81,15 +82,23 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(InternalAuthenticationServiceException.class)
   public ResponseEntity<Map<String, String>> handleInternalAuthenticationServiceException(InternalAuthenticationServiceException exception) {
     Map<String, String> error = new HashMap<>();
-    error.put("error", "Login/password incorrect");
+    error.put("error", "Login/senha incorreta");
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<Map<String, String>> handleAccessDeniedException(AccessDeniedException exception) {
+      Map<String, String> error = new HashMap<>();
+      System.out.println(exception.getMessage());
+      error.put("error", "Acesso negado");
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Map<String, String>> handleGenericException(Exception exception) {
       Map<String, String> error = new HashMap<>();
       System.out.println(exception.getMessage());
-      error.put("error", "An unexpected error occurred");
+      error.put("error", "Um erro inesperado ocorreu");
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
   }
 }

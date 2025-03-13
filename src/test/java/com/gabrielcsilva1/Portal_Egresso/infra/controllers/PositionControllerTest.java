@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -20,15 +19,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.PositionDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.position.UpdatePositionDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.IGenericUser;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Position;
-import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.PositionRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TokenService;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.position.RequestCreatePositionJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.position.RequestUpdatePositionJson;
+import com.gabrielcsilva1.utils.faker.FakeGraduateFactory;
 
 import jakarta.servlet.http.Cookie;
 
@@ -47,63 +46,46 @@ public class PositionControllerTest {
   private TokenService tokenService;
 
   @Autowired
-  private CoordinatorRepository coordinatorRepository;
-
-  @Autowired
   private GraduateRepository graduateRepository;
 
   @Autowired
   private PositionRepository positionRepository;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
-
-  private Coordinator coordinator;
-
   private Graduate graduate;
-
-  private Cookie cookie;
 
   @BeforeEach
   public void setup() {
-    Coordinator coordinatorToSave = Coordinator.builder()
-      .login("admin")
-      .password(passwordEncoder.encode("admin"))
-      .build();
+    Graduate graduateInDatabase = FakeGraduateFactory.makeGraduate();
 
-    Graduate graduateToSave = Graduate.builder()
-      .name("John Doe")
-      .email("john.doe@example.com")
-      .build();
-
-    this.coordinator = coordinatorRepository.save(coordinatorToSave);
-    this.graduate = graduateRepository.save(graduateToSave);
+    this.graduate = graduateRepository.save(graduateInDatabase);
   }
 
   @AfterEach
   public void clean() {
-    coordinatorRepository.deleteAll();
     graduateRepository.deleteAll();
   }
 
-  private void authenticateUser() {
-    String accessToken = tokenService.generateToken(coordinator.getId().toString());
-    cookie = new Cookie("jwtToken", accessToken);
+  private Cookie authenticateUser(String subject, IGenericUser user) {
+    var jwtToken = tokenService.generateToken(subject, user.getRoles());
+
+    return new Cookie("jwtToken", jwtToken);
   }
 
   @Test
   public void register_graduate_position_controller_success() throws Exception{
-    authenticateUser();
+    Cookie cookie = authenticateUser(
+      graduate.getId().toString(),
+      graduate
+    );
 
-    PositionDTO positionDTO = PositionDTO.builder()
-      .graduateId(graduate.getId())
+    RequestCreatePositionJson positionDTO = RequestCreatePositionJson.builder()
       .location("Location")
       .description("Description")
       .startYear(2005)
       .build();
 
     var result = mockMvc.perform(
-      MockMvcRequestBuilders.post("/graduate/position")
+      MockMvcRequestBuilders.post("/position")
       .cookie(cookie)
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(positionDTO))
@@ -118,7 +100,10 @@ public class PositionControllerTest {
 
   @Test
   public void update_graduate_position_success() throws Exception {
-    authenticateUser();
+    Cookie cookie = authenticateUser(
+      graduate.getId().toString(),
+      graduate
+    );
 
     Position positionInDatabase = Position.builder()
       .graduate(graduate)
@@ -129,7 +114,7 @@ public class PositionControllerTest {
 
     positionInDatabase = positionRepository.save(positionInDatabase);
 
-    UpdatePositionDTO positionDTO = UpdatePositionDTO.builder()
+    RequestUpdatePositionJson positionDTO = RequestUpdatePositionJson.builder()
       .location("New Location")
       .description("New Description")
       .startYear(2000)
@@ -137,7 +122,7 @@ public class PositionControllerTest {
       .build();
 
     var result = mockMvc.perform(
-      MockMvcRequestBuilders.put("/graduate/position/{id}", positionInDatabase.getId())
+      MockMvcRequestBuilders.put("/position/{id}", positionInDatabase.getId())
       .cookie(cookie)
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(positionDTO))
@@ -157,7 +142,10 @@ public class PositionControllerTest {
 
   @Test
   public void delete_graduate_position_success() throws Exception {
-    authenticateUser();
+    Cookie cookie = authenticateUser(
+      graduate.getId().toString(),
+      graduate
+    );
 
     Position positionInDatabase = Position.builder()
       .graduate(graduate)
@@ -169,7 +157,7 @@ public class PositionControllerTest {
     positionInDatabase = positionRepository.save(positionInDatabase);
 
     var result = mockMvc.perform(
-      MockMvcRequestBuilders.delete("/graduate/position/{id}", positionInDatabase.getId())
+      MockMvcRequestBuilders.delete("/position/{id}", positionInDatabase.getId())
       .cookie(cookie)
     );
 

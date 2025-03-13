@@ -13,10 +13,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
+import com.gabrielcsilva1.Portal_Egresso.dtos.enums.StatusEnum;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -65,9 +67,9 @@ public class TestimonialRepositoryTest {
   @DisplayName("should find all testimonials ordered by created at desc")
   public void find_all_by_order_by_created_at_desc() {
     this.populateTestimonial();
-    Pageable pageable = PageRequest.of(0, 10);
+    Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-    Page<Testimonial> testimonials = testimonialRepository.findAllByOrderByCreatedAtDesc(pageable);
+    Page<Testimonial> testimonials = testimonialRepository.findByRegistrationStatus(StatusEnum.PENDING, pageable);
     
     assertThat(testimonials.getContent()).hasSize(3);
     assertThat(testimonials.getContent().get(0).getText()).isEqualTo("This is a recent testimonial.");
@@ -79,6 +81,7 @@ public class TestimonialRepositoryTest {
     graduate = Graduate.builder()
       .name("John Doe")
       .email("john.doe@example.com")
+      .password("123456")
       .build();
     
     graduateRepository.save(graduate);

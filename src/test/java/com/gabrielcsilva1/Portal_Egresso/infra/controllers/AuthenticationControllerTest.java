@@ -3,7 +3,6 @@ package com.gabrielcsilva1.Portal_Egresso.infra.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,9 +16,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.AuthenticationDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.authentication.RequestCoordinatorAuthenticationJson;
+import com.gabrielcsilva1.utils.faker.FakeCoordinatorFactory;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -39,21 +39,15 @@ public class AuthenticationControllerTest {
   @Autowired
   private ObjectMapper objectMapper;
 
-  private Coordinator coordinator;
-
-  @BeforeEach
-  public void setUp() {
-    Coordinator coordinatorToSave = Coordinator.builder()
-      .login("admin")
-      .password(passwordEncoder.encode("admin"))
-      .build();
-
-    this.coordinator = coordinatorRepository.save(coordinatorToSave);
-  }
-
   @Test
   public void authentication_success() throws Exception {
-    AuthenticationDTO authenticationDTO = new AuthenticationDTO(coordinator.getLogin(), "admin");
+    Coordinator coordinator = FakeCoordinatorFactory.makeCoordinator();
+    String rawPassword = coordinator.getPassword();
+
+    coordinator.setPassword(passwordEncoder.encode(rawPassword));
+    coordinatorRepository.save(coordinator);
+
+    RequestCoordinatorAuthenticationJson authenticationDTO = new RequestCoordinatorAuthenticationJson(coordinator.getLogin(), rawPassword);
 
     String requestJson = objectMapper.writeValueAsString(authenticationDTO);
 
@@ -67,7 +61,9 @@ public class AuthenticationControllerTest {
 
     String setCookieHeader  = result.andReturn().getResponse().getHeader("Set-Cookie");
     assertThat(setCookieHeader).isNotNull();
-    assertTrue(setCookieHeader.contains("jwtToken="));
-    assertTrue(setCookieHeader.contains("HttpOnly"));
+    if (setCookieHeader != null) {
+      assertTrue(setCookieHeader.contains("jwtToken="));
+      assertTrue(setCookieHeader.contains("HttpOnly"));
+    }
   }
 }

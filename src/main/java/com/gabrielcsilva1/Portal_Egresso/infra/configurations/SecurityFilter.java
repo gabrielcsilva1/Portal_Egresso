@@ -1,17 +1,22 @@
 package com.gabrielcsilva1.Portal_Egresso.infra.configurations;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.IGenericUser;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
+import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TokenService;
+import com.gabrielcsilva1.Portal_Egresso.dtos.enums.RoleEnum;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,6 +32,9 @@ public class SecurityFilter extends OncePerRequestFilter {
   @Autowired
   private CoordinatorRepository coordinatorRepository;
 
+  @Autowired
+  private GraduateRepository graduateRepository;
+
   @SuppressWarnings("null")
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -35,11 +43,22 @@ public class SecurityFilter extends OncePerRequestFilter {
     
     if (token != null) {
       try {
-        String subject = this.tokenService.validateToken(token);
+        DecodedJWT decodedJWT = this.tokenService.validateToken(token);
+        
+        if (decodedJWT == null) {
+          throw new IllegalArgumentException("Invalid token");
+        }
 
-        UserDetails coordinator = this.coordinatorRepository.findById(UUID.fromString(subject)).get();
+        String userId = decodedJWT.getSubject();
+        List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
 
-        var authentication = new UsernamePasswordAuthenticationToken(coordinator, null, coordinator.getAuthorities());
+        List<SimpleGrantedAuthority> grantedAuthorities = roles.stream()
+          .map(role -> new SimpleGrantedAuthority("ROLE_"+role))
+          .toList();
+
+        IGenericUser authenticatedUser = this.findAuthenticateUser(userId, roles);
+
+        var authentication = new UsernamePasswordAuthenticationToken(authenticatedUser, null, grantedAuthorities);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
       } catch (IllegalArgumentException exception) {}
@@ -62,6 +81,23 @@ public class SecurityFilter extends OncePerRequestFilter {
     }
 
     return token;
+  }
+
+  private IGenericUser findAuthenticateUser(String id, List<String> roles) {
+    if (roles.contains(RoleEnum.COORDINATOR.name())) {
+      var coordinator = this.coordinatorRepository.findById(UUID.fromString(id));
+      if (coordinator.isPresent()) {
+        return coordinator.get();
+      }
+    }
+    else if (roles.contains(RoleEnum.GRADUATE.name())) {
+      var graduate = this.graduateRepository.findById(UUID.fromString(id));
+      if (graduate.isPresent()) {
+        return graduate.get();
+      }
+    }
+
+    throw new IllegalArgumentException("Bad Request");
   }
   
 }

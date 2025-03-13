@@ -4,11 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CoordinatorDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.CoordinatorAlreadyExistsException;
-import com.gabrielcsilva1.Portal_Egresso.domain.services.exeptions.InvalidCredentialsException;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.coordinator.RequestCoordinatorJson;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.CoordinatorAlreadyExistsException;
+import com.gabrielcsilva1.Portal_Egresso.exeptions.InvalidCredentialsException;
 
 @Service
 public class CoordinatorService{
@@ -31,12 +31,12 @@ public class CoordinatorService{
       throw new InvalidCredentialsException();
     }
 
-    String accessToken = tokenService.generateToken(coordinator.getId().toString());
+    String accessToken = tokenService.generateToken(coordinator.getId().toString(), coordinator.getRoles());
 
     return accessToken;
   }
 
-  public Coordinator create(CoordinatorDTO coordinatorDTO) {
+  public Coordinator create(RequestCoordinatorJson coordinatorDTO) {
     Coordinator coordinator = coordinatorDTO.toEntity();
 
     boolean coordinatorAlreadyExists = coordinatorRepository.findByLogin(coordinatorDTO.getLogin())

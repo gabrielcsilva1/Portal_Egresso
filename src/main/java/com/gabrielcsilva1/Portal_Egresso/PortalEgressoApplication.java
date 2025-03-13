@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.info.Info;
 	)
 )
 public class PortalEgressoApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(PortalEgressoApplication.class, args);
 	}

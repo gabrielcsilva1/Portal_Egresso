@@ -10,10 +10,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Testimonial;
+import com.gabrielcsilva1.Portal_Egresso.dtos.enums.StatusEnum;
 
 public interface TestimonialRepository extends JpaRepository<Testimonial, UUID>{
-  Page<Testimonial> findAllByOrderByCreatedAtDesc(Pageable pageable);
-  List<Testimonial> findAllByOrderByCreatedAtDesc();
+  Page<Testimonial> findByRegistrationStatus(StatusEnum registrationStatus, Pageable pageable);
+
+  List<Testimonial> findByGraduateIdOrderByCreatedAtDesc(UUID graduateId);
 
   @Query("SELECT t FROM Testimonial t WHERE YEAR(t.createdAt) = :year")
   Page<Testimonial> findByYear(@Param("year") int year, Pageable pageable);

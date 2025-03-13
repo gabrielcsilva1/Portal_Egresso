@@ -1,9 +1,14 @@
 package com.gabrielcsilva1.Portal_Egresso.domain.entities;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
+
+import com.gabrielcsilva1.Portal_Egresso.dtos.enums.StatusEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,16 +41,24 @@ public class JobOpportunity {
   @Column(nullable = false)
   private String title;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 1000)
   private String description;
 
   @Column(nullable = false)
-  private Boolean isVerified;
+  @Enumerated(EnumType.STRING)
+  private StatusEnum registrationStatus;
+
+  @Column(nullable = false, name = "created_at")
+  private LocalDateTime createdAt;
 
   @PrePersist
   private void prePersist() {
-    if (this.isVerified == null) {
-      this.isVerified = false;
+    if (this.registrationStatus == null) {
+      this.registrationStatus = StatusEnum.PENDING;
+    }
+    
+    if (this.createdAt == null) {
+      this.createdAt = LocalDateTime.now();
     }
   }
 }

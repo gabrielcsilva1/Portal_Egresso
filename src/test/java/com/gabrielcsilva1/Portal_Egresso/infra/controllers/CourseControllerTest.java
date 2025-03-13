@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -21,10 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.CourseDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateCourseDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.CourseResponse;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.course.UpdateCourseDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
@@ -34,6 +29,13 @@ import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateCourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TokenService;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.course.RequestCreateCourseJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.course.RequestUpdateCourseJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.graduateCourse.RequestGraduateCourseJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.response.course.ResponseShortCourseJson;
+import com.gabrielcsilva1.utils.faker.FakeCoordinatorFactory;
+import com.gabrielcsilva1.utils.faker.FakeCourseFactory;
+import com.gabrielcsilva1.utils.faker.FakeGraduateFactory;
 
 import jakarta.servlet.http.Cookie;
 
@@ -61,9 +63,6 @@ public class CourseControllerTest {
   private GraduateCourseRepository graduateCourseRepository;
 
   @Autowired
-  private PasswordEncoder passwordEncoder;
-
-  @Autowired
   private TokenService tokenService;
 
   private Coordinator coordinator;
@@ -72,13 +71,8 @@ public class CourseControllerTest {
 
   @BeforeEach
   public void setup() {
-    Coordinator coordinatorToSave = Coordinator.builder()
-      .login("admin")
-      .password(passwordEncoder.encode("admin"))
-      .build();
-
+    Coordinator coordinatorToSave = FakeCoordinatorFactory.makeCoordinator();
     this.coordinator = coordinatorRepository.save(coordinatorToSave);
-    this.cookie = new Cookie("jwtToken", tokenService.generateToken(coordinator.getId().toString()));
   }
 
   @AfterEach
@@ -86,9 +80,16 @@ public class CourseControllerTest {
     coordinatorRepository.deleteAll();
   }
 
+  private void authenticateCoordinator() {
+    var token = tokenService.generateToken(coordinator.getId().toString(), coordinator.getRoles());
+    this.cookie = new Cookie("jwtToken", token);
+  }
+
   @Test
   public void create_course_controller_success() throws Exception {
-    CourseDTO courseDTO = new CourseDTO("Ciências da Computação", "Graduação");
+    authenticateCoordinator();
+
+    RequestCreateCourseJson courseDTO = new RequestCreateCourseJson("Ciências da Computação", "Graduação");
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.post("/course")
@@ -107,20 +108,11 @@ public class CourseControllerTest {
 
   @Test
   public void fetch_courses_controller_success() throws Exception {
-    Course courseToSave = Course.builder()
-      .name("Ciências da computação")
-      .coordinator(coordinator)
-      .level("Graduação")
-      .build();
+    Course courseInDatabase1 = FakeCourseFactory.makeCourse(coordinator);
+    courseRepository.save(courseInDatabase1);
 
-    courseRepository.save(courseToSave);
-
-    courseToSave = Course.builder()
-      .name("Ciências da computação")
-      .coordinator(coordinator)
-      .level("Pós-Graduação")
-      .build();
-    courseRepository.save(courseToSave);
+    Course courseInDatabase2 = FakeCourseFactory.makeCourse(coordinator);
+    courseRepository.save(courseInDatabase2);
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.get("/course")
@@ -130,9 +122,9 @@ public class CourseControllerTest {
     result.andExpect(MockMvcResultMatchers.status().isOk());
     
     String jsonResponse = result.andReturn().getResponse().getContentAsString();
-    List<CourseResponse> fetchCourseResponses = objectMapper.readValue(
+    List<ResponseShortCourseJson> fetchCourseResponses = objectMapper.readValue(
       jsonResponse,
-      new TypeReference<List<CourseResponse>>() {}
+      new TypeReference<List<ResponseShortCourseJson>>() {}
     );
 
     assertThat(fetchCourseResponses).hasSize(2);
@@ -140,21 +132,15 @@ public class CourseControllerTest {
 
   @Test
   public void register_graduate_in_course_controller_success() throws Exception {
-    Course courseInDatabase = Course.builder()
-      .coordinator(coordinator)
-      .name("Ciências da computação")
-      .level("Graduação")
-      .build();
-    
-    Graduate graduateInDatabase = Graduate.builder()
-      .name("John Doe")
-      .email("johndoe@example.com")
-      .build();
+    authenticateCoordinator();
 
+    Course courseInDatabase = FakeCourseFactory.makeCourse(coordinator);
     courseInDatabase = courseRepository.save(courseInDatabase);
+  
+    Graduate graduateInDatabase = FakeGraduateFactory.makeGraduate();
     graduateInDatabase = graduateRepository.save(graduateInDatabase);
 
-    GraduateCourseDTO graduateCourseDTO = GraduateCourseDTO.builder()
+    RequestGraduateCourseJson graduateCourseDTO = RequestGraduateCourseJson.builder()
       .courseId(courseInDatabase.getId())
       .graduateId(graduateInDatabase.getId())
       .startYear(2010)
@@ -180,16 +166,10 @@ public class CourseControllerTest {
 
   @Test
   public void unregister_graduate_in_course_controller_success() throws Exception {
-    Course courseInDatabase = Course.builder()
-      .coordinator(coordinator)
-      .name("Ciências da computação")
-      .level("Graduação")
-      .build();
+    authenticateCoordinator();
+    Course courseInDatabase = FakeCourseFactory.makeCourse(coordinator);
     
-    Graduate graduateInDatabase = Graduate.builder()
-      .name("John Doe")
-      .email("johndoe@example.com")
-      .build();
+    Graduate graduateInDatabase = FakeGraduateFactory.makeGraduate();
 
     courseInDatabase = courseRepository.save(courseInDatabase);
     graduateInDatabase = graduateRepository.save(graduateInDatabase);
@@ -203,7 +183,7 @@ public class CourseControllerTest {
     graduateCourseInDatabase = graduateCourseRepository.save(graduateCourseInDatabase);
 
     var result = mockMvc.perform(
-      MockMvcRequestBuilders.delete("/course/graduate/{id}", graduateCourseInDatabase.getId())
+      MockMvcRequestBuilders.delete("/course/{courseId}/graduate/{graduateId}", courseInDatabase.getId(),graduateInDatabase.getId())
        .cookie(cookie)
     );
 
@@ -217,16 +197,13 @@ public class CourseControllerTest {
 
   @Test
   public void update_course_controller_success() throws Exception {
-    UpdateCourseDTO courseDTO = UpdateCourseDTO.builder()
+    authenticateCoordinator();
+    RequestUpdateCourseJson courseDTO = RequestUpdateCourseJson.builder()
       .name("New name")
       .level("New level")
       .build();
     
-    Course courseInDatabase = Course.builder()
-      .coordinator(coordinator)
-      .name("Ciências da computação")
-      .level("Graduação")
-      .build();
+    Course courseInDatabase = FakeCourseFactory.makeCourse(coordinator);
 
     courseInDatabase = courseRepository.save(courseInDatabase);
 
@@ -248,11 +225,9 @@ public class CourseControllerTest {
 
   @Test
   public void delete_course_controller_success() throws Exception {
-    Course courseInDatabase = Course.builder()
-      .coordinator(coordinator)
-      .name("Ciências da computação")
-      .level("Graduação")
-      .build();
+    authenticateCoordinator();
+
+    Course courseInDatabase = FakeCourseFactory.makeCourse(coordinator);
 
     courseInDatabase = courseRepository.save(courseInDatabase);
 

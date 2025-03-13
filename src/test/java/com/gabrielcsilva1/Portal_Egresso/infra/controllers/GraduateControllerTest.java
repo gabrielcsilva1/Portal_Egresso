@@ -3,7 +3,6 @@ package com.gabrielcsilva1.Portal_Egresso.infra.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +17,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.GraduateDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.FetchGraduateResponse;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.GraduateResponse;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.graduate.UpdateGraduateDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.paginated.PaginatedResponse;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Coordinator;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.Course;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
+import com.gabrielcsilva1.Portal_Egresso.domain.entities.IGenericUser;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CoordinatorRepository;
+import com.gabrielcsilva1.Portal_Egresso.domain.repositories.CourseRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.services.TokenService;
+import com.gabrielcsilva1.Portal_Egresso.dtos.paginated.ResponsePaginated;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.graduate.RequestCreateGraduateJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.graduate.RequestUpdateGraduateJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.response.graduate.ResponseGraduateJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.response.graduate.ResponseShortGraduateJson;
+import com.gabrielcsilva1.utils.faker.FakeCoordinatorFactory;
+import com.gabrielcsilva1.utils.faker.FakeCourseFactory;
+import com.gabrielcsilva1.utils.faker.FakeGraduateFactory;
 
 import jakarta.servlet.http.Cookie;
 
@@ -43,7 +48,7 @@ public class GraduateControllerTest {
   private CoordinatorRepository coordinatorRepository;
 
   @Autowired
-  private TokenService tokenService;
+  private CourseRepository courseRepository;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -51,36 +56,20 @@ public class GraduateControllerTest {
   @Autowired
   private MockMvc mockMvc;
 
-  private Cookie cookie;
+  @Autowired
+  private TokenService tokenService;
 
-  private void createCoordinatorAndAuthenticate() {
-    var coordinator = Coordinator.builder()
-     .login("admin")
-     .password("password")
-     .build();
+  private Cookie authenticateUser(String subject, IGenericUser user) {
+    var jwtToken = tokenService.generateToken(subject, user.getRoles());
 
-    coordinator = coordinatorRepository.save(coordinator);
-
-    String accessToken = tokenService.generateToken(coordinator.getId().toString());
-    cookie = new Cookie("jwtToken", accessToken);
+    return new Cookie("jwtToken", jwtToken);
   }
-
 
   @Test
   public void fetch_graduates_controller_success() throws Exception {
-    Graduate graduateInDatabase1 = Graduate.builder()
-      .name("John Doe 1")
-      .email("johndoe1@example.com")
-      .graduateCourses(Set.of())
-      .positions(Set.of())
-      .build();
+    Graduate graduateInDatabase1 = FakeGraduateFactory.makeGraduate();
 
-    Graduate graduateInDatabase2 = Graduate.builder()
-      .name("John Doe 2")
-      .email("johndoe2@example.com")
-      .graduateCourses(Set.of())
-      .positions(Set.of())
-      .build();
+    Graduate graduateInDatabase2 = FakeGraduateFactory.makeGraduate();
 
     graduateRepository.save(graduateInDatabase1);
     graduateRepository.save(graduateInDatabase2);
@@ -90,9 +79,9 @@ public class GraduateControllerTest {
     );
 
     String jsonResponse = result.andReturn().getResponse().getContentAsString();
-    PaginatedResponse<FetchGraduateResponse> fetchGraduatesResponse = objectMapper.readValue(
+    ResponsePaginated<ResponseShortGraduateJson> fetchGraduatesResponse = objectMapper.readValue(
       jsonResponse,
-      new TypeReference<PaginatedResponse<FetchGraduateResponse>>(){}
+      new TypeReference<ResponsePaginated<ResponseShortGraduateJson>>(){}
     );
 
     assertThat(fetchGraduatesResponse.getContent()).isNotNull();
@@ -101,16 +90,22 @@ public class GraduateControllerTest {
 
   @Test
   public void create_graduate_controller_success() throws Exception {
-    createCoordinatorAndAuthenticate();
+    Coordinator coordinator = FakeCoordinatorFactory.makeCoordinator();
+    coordinator = coordinatorRepository.save(coordinator);
 
-    GraduateDTO graduateDTO = GraduateDTO.builder()
+    Course courseInDatabase = FakeCourseFactory.makeCourse(coordinator);
+    courseInDatabase = courseRepository.save(courseInDatabase);
+
+    RequestCreateGraduateJson graduateDTO = RequestCreateGraduateJson.builder()
       .name("John Doe")
       .email("johndoe@example.com")
+      .password("123456")
+      .courseId(courseInDatabase.getId())
+      .startYear(2000)
       .build();
 
     var result = mockMvc.perform(
       MockMvcRequestBuilders.post("/graduate")
-       .cookie(cookie)
        .contentType(MediaType.APPLICATION_JSON)
        .content(objectMapper.writeValueAsString(graduateDTO))
     );
@@ -125,12 +120,7 @@ public class GraduateControllerTest {
 
   @Test
   public void get_graduate_by_id_controller_success() throws Exception {
-    Graduate graduateInDatabase = Graduate.builder()
-      .name("John Doe")
-      .email("johndoe@example.com")
-      .graduateCourses(Set.of())
-      .positions(Set.of())
-      .build();
+    Graduate graduateInDatabase = FakeGraduateFactory.makeGraduate();
 
     graduateInDatabase = graduateRepository.save(graduateInDatabase);
 
@@ -139,9 +129,9 @@ public class GraduateControllerTest {
     );
 
     String jsonResponse = result.andReturn().getResponse().getContentAsString();
-    GraduateResponse getGraduateResponse = objectMapper.readValue(
+    ResponseGraduateJson getGraduateResponse = objectMapper.readValue(
       jsonResponse,
-      GraduateResponse.class
+      ResponseGraduateJson.class
     );
 
     assertThat(getGraduateResponse).isNotNull();
@@ -151,9 +141,7 @@ public class GraduateControllerTest {
 
   @Test
   public void update_graduate_by_id_controller_success() throws Exception {
-    createCoordinatorAndAuthenticate();
-
-    UpdateGraduateDTO graduateDTO = UpdateGraduateDTO.builder()
+    RequestUpdateGraduateJson graduateDTO = RequestUpdateGraduateJson.builder()
       .name("Update")
       .email("update@example.com")
       .avatarUrl("https://avatarUrlUpdated.png")
@@ -163,15 +151,12 @@ public class GraduateControllerTest {
       .linkedin("linkedinUpdated")
       .build();
 
-    Graduate graduateInDatabase = Graduate.builder()
-      .name("John Doe")
-      .email("johndoe@example.com")
-      .graduateCourses(Set.of())
-      .positions(Set.of())
-      .build();
+    Graduate graduateInDatabase = FakeGraduateFactory.makeGraduate();
 
     graduateInDatabase = graduateRepository.save(graduateInDatabase);
-
+      
+    var cookie = this.authenticateUser(graduateInDatabase.getId().toString(), graduateInDatabase);
+      
     var result = mockMvc.perform(
       MockMvcRequestBuilders.put("/graduate/{id}", graduateInDatabase.getId())
        .contentType(MediaType.APPLICATION_JSON)
@@ -195,12 +180,15 @@ public class GraduateControllerTest {
 
   @Test
   public void delete_graduate_by_id_controller_success() throws Exception {
-    createCoordinatorAndAuthenticate();
+    Coordinator coordinatorInDatabase = FakeCoordinatorFactory.makeCoordinator();
+    coordinatorInDatabase = coordinatorRepository.save(coordinatorInDatabase);
 
-    Graduate graduateInDatabase = Graduate.builder()
-      .name("John Doe")
-      .email("johndoe@example.com")
-      .build();
+    var cookie = this.authenticateUser(
+      coordinatorInDatabase.getId().toString(), 
+      coordinatorInDatabase
+      );
+
+    Graduate graduateInDatabase = FakeGraduateFactory.makeGraduate();
 
     graduateInDatabase = graduateRepository.save(graduateInDatabase);
 

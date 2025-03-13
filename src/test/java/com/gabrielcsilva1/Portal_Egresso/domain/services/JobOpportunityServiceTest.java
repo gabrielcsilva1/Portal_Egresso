@@ -13,12 +13,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.JobOpportunityDTO;
-import com.gabrielcsilva1.Portal_Egresso.domain.dtos.jobOpportunity.UpdateJobOpportunityDTO;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.Graduate;
 import com.gabrielcsilva1.Portal_Egresso.domain.entities.JobOpportunity;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.GraduateRepository;
 import com.gabrielcsilva1.Portal_Egresso.domain.repositories.JobOpportunityRepository;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.jobOpportunity.RequestCreateJobOpportunityJson;
+import com.gabrielcsilva1.Portal_Egresso.dtos.request.jobOpportunity.RequestUpdateJobOpportunityJson;
 
 @ExtendWith(MockitoExtension.class)
 public class JobOpportunityServiceTest {
@@ -33,14 +33,13 @@ public class JobOpportunityServiceTest {
 
   @Test
   public void create_job_opportunity_success() {
-    JobOpportunityDTO dto = JobOpportunityDTO.builder()
-    .graduateId(UUID.randomUUID())
+    RequestCreateJobOpportunityJson dto = RequestCreateJobOpportunityJson.builder()
     .title("Job title")
     .description("Job description")
     .build();
 
     var graduateMock = Graduate.builder()
-      .id(dto.getGraduateId())
+      .id(UUID.randomUUID())
       .build();
 
     when(this.graduateRepository.findById(any(UUID.class)))
@@ -49,7 +48,7 @@ public class JobOpportunityServiceTest {
     when(this.jobOpportunityRepository.save(any(JobOpportunity.class)))
     .thenAnswer(invocation -> invocation.getArgument(0));
 
-    JobOpportunity result = this.sut.create(dto);
+    JobOpportunity result = this.sut.createJobOpportunity(graduateMock.getId(), dto);
 
     assertEquals(result.getTitle(), dto.getTitle());
     assertEquals(result.getDescription(), dto.getDescription());
@@ -58,7 +57,7 @@ public class JobOpportunityServiceTest {
   @Test
   public void update_job_opportunity_success() {
     UUID jobOpportunityId = UUID.randomUUID();
-    UpdateJobOpportunityDTO dto = UpdateJobOpportunityDTO.builder()
+    RequestUpdateJobOpportunityJson dto = RequestUpdateJobOpportunityJson.builder()
     .title("New Job title")
     .description("New Job description")
     .build();
@@ -75,7 +74,7 @@ public class JobOpportunityServiceTest {
     when(this.jobOpportunityRepository.save(any(JobOpportunity.class)))
     .thenAnswer(invocation -> invocation.getArgument(0));
 
-    JobOpportunity result = this.sut.update(jobOpportunityId, dto);
+    JobOpportunity result = this.sut.updateJobOpportunity(jobOpportunityId, dto);
 
     assertEquals(result.getTitle(), dto.getTitle());
     assertEquals(result.getDescription(), dto.getDescription());
