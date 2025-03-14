@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCourses } from '@/hooks/use-courses'
+import { Search, X } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router'
 import { z } from 'zod'
@@ -29,7 +30,9 @@ export function GraduateFilterForm() {
   const courseName = searchParams.get('courseName')
   const query = searchParams.get('query')
 
-  const { register, handleSubmit, control } = useForm<GraduateFilterFormSchema>({
+  const hasAnyFilter = Boolean(year) || Boolean(courseName) || Boolean(query)
+
+  const { register, handleSubmit, control, reset } = useForm<GraduateFilterFormSchema>({
     defaultValues: {
       courseName: courseName ?? '',
       query: query ?? '',
@@ -67,6 +70,19 @@ export function GraduateFilterForm() {
     })
   }
 
+  function handleClearFilters() {
+    setSearchParams((prev) => {
+      prev.delete('year')
+      prev.delete('courseName')
+      prev.delete('query')
+      prev.set('page', '1')
+
+      return prev
+    })
+
+    reset()
+  }
+
   if (isFetchingCourses) {
     return (
       <div className="flex items-center gap-2 mt-8">
@@ -102,7 +118,14 @@ export function GraduateFilterForm() {
         />
       )}
       <Input placeholder="Ano" type="number" {...register('year')} className="w-36" />
-      <Button size="sm">Buscar</Button>
+      <Button type="submit" size="sm">
+        <Search className="h-4 w-4" />
+        Buscar
+      </Button>
+      <Button type="button" size="sm" onClick={handleClearFilters} disabled={!hasAnyFilter}>
+        <X className="h-4 w-4" />
+        Remover Filtros
+      </Button>
     </form>
   )
 }
