@@ -7,8 +7,8 @@ POST {{url}}/coordinator/session
 Content-Type: application/json
 
 {
-  "login": "user",
-  "password": "123456"
+  "login": "admin",
+  "password": "admin"
 }
 
 ###

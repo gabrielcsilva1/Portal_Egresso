@@ -48,9 +48,9 @@ public class GraduateController {
   @ApiResponse( responseCode = "200", description = "List of Graduates")
   public ResponseEntity<ResponsePaginated<ResponseShortGraduateJson>> fetchGraduates(
     @ModelAttribute QueryGraduate filters,
-    @RequestParam(defaultValue = "1") Integer page
+    @RequestParam(defaultValue = "0") Integer pageIndex
     ) {
-    Page<Graduate> filteredGraduates = this.graduateService.fetchVerifiedGraduates(filters.toSpecification(), page-1);
+    Page<Graduate> filteredGraduates = this.graduateService.fetchVerifiedGraduates(filters.toSpecification(), pageIndex);
 
     List<ResponseShortGraduateJson> graduateShortList = filteredGraduates.getContent().stream()
     .map(ResponseShortGraduateJson::toResponse)

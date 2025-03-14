@@ -1,16 +1,10 @@
-import {
-  type DeletePositionRequest,
-  deletePosition,
-} from '@/api/position/delete-position'
+import { type DeletePositionRequest, deletePosition } from '@/api/position/delete-position'
 import type { FetchGraduatePositionsResponse } from '@/api/position/fetch-graduate-positions'
 import {
   type RegisterPositionRequest,
   registerPosition,
 } from '@/api/position/register-position'
-import {
-  type UpdatePositionRequest,
-  updatePosition,
-} from '@/api/position/update-position'
+import { type UpdatePositionRequest, updatePosition } from '@/api/position/update-position'
 import { Dialog } from '@/components/dialog'
 import { PositionCard } from '@/components/position-card'
 import { Button } from '@/components/ui/button'
@@ -27,62 +21,68 @@ export function ManageGraduatePosition() {
   const { graduate } = useOutletContext<GraduateConfigLayoutContextProps>()
   const queryClient = useQueryClient()
 
-  const { data: positions, isLoading: isFetchingPositions } =
-    useGraduatePositions({ graduateId: graduate.id })
-  const {
-    mutateAsync: mutateRegisterPosition,
-    isPending: isRegisteringPosition,
-  } = useMutation({
-    mutationFn: registerPosition,
-    onSuccess: ({ id, description, location, startYear, endYear }) => {
-      const cached = queryClient.getQueryData<FetchGraduatePositionsResponse>([
-        'positions',
-        graduate.id,
-      ])
-      if (cached) {
-        queryClient.setQueryData<FetchGraduatePositionsResponse>(
-          ['positions', graduate.id],
-          [
-            ...cached,
-            {
-              id,
-              description,
-              location,
-              startYear,
-              endYear,
-            },
-          ]
-        )
+  const { data: positions, isLoading: isFetchingPositions } = useGraduatePositions({
+    graduateId: graduate.id,
+  })
+  const { mutateAsync: mutateRegisterPosition, isPending: isRegisteringPosition } =
+    useMutation({
+      mutationFn: registerPosition,
+      onSuccess: ({ id, description, location, startYear, endYear }) => {
+        const cached = queryClient.getQueryData<FetchGraduatePositionsResponse>([
+          'positions',
+          graduate.id,
+        ])
+        if (cached) {
+          queryClient.setQueryData<FetchGraduatePositionsResponse>(
+            ['positions', graduate.id],
+            [
+              ...cached,
+              {
+                id,
+                description,
+                location,
+                startYear,
+                endYear,
+              },
+            ]
+          )
+        }
+
+        queryClient.invalidateQueries({
+          queryKey: ['graduate', graduate.id],
+        })
+      },
+    })
+
+  const { mutateAsync: mutateDeletePosition, isPending: isDeletingPosition } = useMutation({
+    mutationFn: async ({ positionId }: DeletePositionRequest) => {
+      const confirmed = confirm('Você tem certeza que deseja excluir esse item?')
+      if (confirmed) {
+        await deletePosition({ positionId })
       }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['positions'],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['graduate', graduate.id],
+      })
     },
   })
 
-  const { mutateAsync: mutateDeletePosition, isPending: isDeletingPosition } =
-    useMutation({
-      mutationFn: async ({ positionId }: DeletePositionRequest) => {
-        const confirmed = confirm(
-          'Você tem certeza que deseja excluir esse item?'
-        )
-        if (confirmed) {
-          await deletePosition({ positionId })
-        }
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ['positions'],
-        })
-      },
-    })
+  const { mutateAsync: mutateUpdatePosition, isPending: isUpdatingPosition } = useMutation({
+    mutationFn: updatePosition,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['positions'],
+      })
 
-  const { mutateAsync: mutateUpdatePosition, isPending: isUpdatingPosition } =
-    useMutation({
-      mutationFn: updatePosition,
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ['positions'],
-        })
-      },
-    })
+      queryClient.invalidateQueries({
+        queryKey: ['graduate', graduate.id],
+      })
+    },
+  })
 
   async function handleCreatePosition({
     description,
@@ -125,19 +125,19 @@ export function ManageGraduatePosition() {
   }
 
   if (isFetchingPositions) {
-    return <Skeleton className='w-full h-40' />
+    return <Skeleton className="w-full h-40" />
   }
   if (!graduate) {
-    return <Navigate to='/' replace />
+    return <Navigate to="/" replace />
   }
 
   return (
-    <div className='flex flex-col gap-6'>
-      <h1 className='font-bold text-xl'>Cargos</h1>
+    <div className="flex flex-col gap-6">
+      <h1 className="font-bold text-xl">Cargos</h1>
 
       <Dialog.Root>
         <Dialog.Trigger asChild>
-          <Button className='self-start'>
+          <Button className="self-start">
             <Plus strokeWidth={3} />
             Adicionar Cargo
           </Button>
@@ -145,23 +145,20 @@ export function ManageGraduatePosition() {
 
         <Dialog.Content>
           <Dialog.Title>Criar Cargo</Dialog.Title>
-          <PositionForm
-            onSubmit={handleCreatePosition}
-            isSubmitting={isRegisteringPosition}
-          />
+          <PositionForm onSubmit={handleCreatePosition} isSubmitting={isRegisteringPosition} />
         </Dialog.Content>
       </Dialog.Root>
 
       {positions?.map((position) => (
         <div key={position.id}>
           <PositionCard
-            className='border-b-0 shadow-none rounded-b-none'
+            className="border-b-0 shadow-none rounded-b-none"
             position={position}
           />
-          <div className='flex justify-center gap-4 border-x border-b border-border rounded-xl pb-4'>
+          <div className="flex justify-center gap-4 border-x border-b border-border rounded-xl pb-4">
             <Button
-              variant='destructive'
-              className='w-28'
+              variant="destructive"
+              className="w-28"
               disabled={isDeletingPosition}
               onClick={() =>
                 mutateDeletePosition({
@@ -175,7 +172,7 @@ export function ManageGraduatePosition() {
             <Dialog.Root>
               <Dialog.Trigger asChild>
                 <Button
-                  className='w-28 bg-amber-500 disabled:bg-amber-500/50 hover:bg-amber-500/90'
+                  className="w-28 bg-amber-500 disabled:bg-amber-500/50 hover:bg-amber-500/90"
                   disabled={isDeletingPosition}
                 >
                   <SquarePen />

@@ -27,61 +27,50 @@ import { TestimonialForm } from './components/testimonial-form'
 export function ManageGraduateTestimonial() {
   const { graduate } = useOutletContext<GraduateConfigLayoutContextProps>()
   const queryClient = useQueryClient()
-  const { data: testimonials, isLoading: isFetchingTestimonials } =
-    useGraduateTestimonials(graduate.id)
-  const {
-    mutateAsync: mutateRegisterTestimonial,
-    isPending: isRegisteringTestimonial,
-  } = useMutation({
-    mutationFn: registerTestimonial,
-    onSuccess: ({ id, text, createdAt, registrationStatus }) => {
-      const cached =
-        queryClient.getQueryData<FetchGraduateTestimonialsResponse>([
+  const { data: testimonials, isLoading: isFetchingTestimonials } = useGraduateTestimonials(
+    graduate.id
+  )
+  const { mutateAsync: mutateRegisterTestimonial, isPending: isRegisteringTestimonial } =
+    useMutation({
+      mutationFn: registerTestimonial,
+      onSuccess: ({ id, text, createdAt, registrationStatus }) => {
+        const cached = queryClient.getQueryData<FetchGraduateTestimonialsResponse>([
           'testimonials',
           graduate.id,
         ])
-      if (cached) {
-        queryClient.setQueryData<FetchGraduateTestimonialsResponse>(
-          ['testimonials', graduate.id],
-          [
-            { id, text, createdAt: new Date(createdAt), registrationStatus },
-            ...cached,
-          ]
-        )
-      }
-    },
-  })
+        if (cached) {
+          queryClient.setQueryData<FetchGraduateTestimonialsResponse>(
+            ['testimonials', graduate.id],
+            [{ id, text, createdAt: new Date(createdAt), registrationStatus }, ...cached]
+          )
+        }
+      },
+    })
 
-  const {
-    mutateAsync: mutateDeleteTestimonial,
-    isPending: isDeletingTestimonial,
-  } = useMutation({
-    mutationFn: async ({ testimonialId }: DeleteTestimonialRequest) => {
-      const confirmed = confirm(
-        'Você tem certeza que deseja excluir esse item?'
-      )
-      if (confirmed) {
-        await deleteTestimonial({ testimonialId })
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['testimonials'],
-      })
-    },
-  })
+  const { mutateAsync: mutateDeleteTestimonial, isPending: isDeletingTestimonial } =
+    useMutation({
+      mutationFn: async ({ testimonialId }: DeleteTestimonialRequest) => {
+        const confirmed = confirm('Você tem certeza que deseja excluir esse item?')
+        if (confirmed) {
+          await deleteTestimonial({ testimonialId })
+        }
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ['testimonials'],
+        })
+      },
+    })
 
-  const {
-    mutateAsync: mutateUpdateTestimonial,
-    isPending: isUpdatingTestimonial,
-  } = useMutation({
-    mutationFn: updateTestimonial,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['testimonials'],
-      })
-    },
-  })
+  const { mutateAsync: mutateUpdateTestimonial, isPending: isUpdatingTestimonial } =
+    useMutation({
+      mutationFn: updateTestimonial,
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ['testimonials'],
+        })
+      },
+    })
 
   async function handleCreateTestimonial({ text }: RegisterTestimonialRequest) {
     try {
@@ -92,10 +81,7 @@ export function ManageGraduateTestimonial() {
     }
   }
 
-  async function handleUpdateTestimonial({
-    testimonialId,
-    text,
-  }: UpdateTestimonialRequest) {
+  async function handleUpdateTestimonial({ testimonialId, text }: UpdateTestimonialRequest) {
     try {
       await mutateUpdateTestimonial({ text, testimonialId })
       toast.success('Depoimento atualizado')
@@ -105,19 +91,19 @@ export function ManageGraduateTestimonial() {
   }
 
   if (isFetchingTestimonials) {
-    return <Skeleton className='w-full h-40' />
+    return <Skeleton className="w-full h-40" />
   }
   if (!graduate) {
-    return <Navigate to='/' replace />
+    return <Navigate to="/" replace />
   }
 
   return (
-    <div className='flex flex-col gap-6'>
-      <h1 className='font-bold text-xl'>Depoimentos</h1>
+    <div className="flex flex-col gap-6">
+      <h1 className="font-bold text-xl">Depoimentos</h1>
 
       <Dialog.Root>
         <Dialog.Trigger asChild>
-          <Button className='self-start'>
+          <Button className="self-start">
             <Plus strokeWidth={3} />
             Adicionar Depoimento
           </Button>
@@ -135,15 +121,15 @@ export function ManageGraduateTestimonial() {
       {testimonials?.map((testimonial) => (
         <div key={testimonial.id}>
           <TestimonialCard
-            className='border-b-0 shadow-none rounded-b-none'
+            className="border-b-0 shadow-none rounded-b-none"
             testimonial={testimonial}
             graduate={graduate}
             showStatus
           />
-          <div className='flex justify-center gap-4 border-x border-b border-border rounded-xl pb-4'>
+          <div className="flex justify-center gap-4 border-x border-b border-border rounded-xl pb-4">
             <Button
-              variant='destructive'
-              className='w-28'
+              variant="destructive"
+              className="w-28"
               disabled={isDeletingTestimonial}
               onClick={() =>
                 mutateDeleteTestimonial({
@@ -157,7 +143,7 @@ export function ManageGraduateTestimonial() {
             <Dialog.Root>
               <Dialog.Trigger asChild>
                 <Button
-                  className='w-28 bg-amber-500 disabled:bg-amber-500/50 hover:bg-amber-500/90'
+                  className="w-28 bg-amber-500 disabled:bg-amber-500/50 hover:bg-amber-500/90"
                   disabled={
                     isDeletingTestimonial ||
                     testimonial.registrationStatus !== StatusEnum.PENDING
