@@ -92,7 +92,6 @@ export function GraduateFilterForm() {
                 <SelectValue placeholder="Curso" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
                 {courses.map((course) => (
                   <SelectItem key={course.id} value={course.name}>
                     {course.name}
