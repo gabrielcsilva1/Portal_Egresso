@@ -3,7 +3,7 @@ import { GraduateCard } from '@/components/graduate-card'
 import { Pagination } from '@/components/pagination'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useQuery } from '@tanstack/react-query'
-import { Navigate, useSearchParams } from 'react-router'
+import { useSearchParams } from 'react-router'
 import { z } from 'zod'
 import { GraduateFilterForm } from './graduate-filter-form'
 
@@ -36,32 +36,28 @@ export function Graduates() {
   if (isFetchingGraduates) {
     return (
       <>
-        <Skeleton className='w-64 h-14 mx-auto mb-6' />
-        <Skeleton className='w-full h-96 max-w-5xl mx-auto' />
-        <Skeleton className='w-full h-96 max-w-5xl mx-auto mt-6' />
+        <Skeleton className="w-64 h-14 mx-auto mb-6" />
+        <Skeleton className="w-full h-96 max-w-5xl mx-auto" />
+        <Skeleton className="w-full h-96 max-w-5xl mx-auto mt-6" />
       </>
     )
   }
 
-  if (!pageGraduates) {
-    return <Navigate to='/' />
-  }
-
   return (
-    <div className='w-full px-20'>
-      <div className='max-w-5xl mx-auto my-8'>
-        <h1 className='text-center text-3xl font-bold'>Egressos</h1>
+    <div className="w-full px-20">
+      <div className="max-w-5xl mx-auto my-8">
+        <h1 className="text-center text-3xl font-bold">Egressos</h1>
         <GraduateFilterForm />
-        <div className='mt-6 flex flex-col gap-8 mb-4'>
-          {pageGraduates.content.map((graduate) => (
+        <div className="mt-6 flex flex-col gap-8 mb-4">
+          {pageGraduates?.content.map((graduate) => (
             <GraduateCard graduate={graduate} key={graduate.id} />
           ))}
         </div>
         <Pagination
           onPageChange={handlePaginate}
-          pageIndex={pageGraduates.pageIndex}
-          totalElements={pageGraduates.totalElements}
-          totalPages={pageGraduates.totalPages}
+          pageIndex={pageGraduates?.pageIndex ?? 0}
+          totalElements={pageGraduates?.totalElements ?? 0}
+          totalPages={pageGraduates?.totalPages ?? 0}
         />
       </div>
     </div>
